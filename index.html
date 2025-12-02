@@ -1,223 +1,662 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Jiyy Eazy - Developer modern dengan solusi web super mudah, cepat, dan efektif.">
-    <title>Jiyy Eazy - Solusi Web Mudah & Cepat</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        html { scroll-behavior: smooth; }
-
-        /* ======================= */
-        /*  ANTI DOWNLOAD PROFILE  */
-        /* ======================= */
-        .no-select {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        .profile-protect {
-            pointer-events: none; /* Tidak bisa dihold, tidak bisa disimpan */
-        }
-
-        /* Watermark selalu tampil */
-        #aji17mark {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 14px;
-            opacity: 0.35;
-            font-weight: 700;
-            color: red;
-            z-index: 999999;
-            pointer-events: none;
-        }
-
-        /* Anti drag image */
-        img, .profile-img {
-            -webkit-user-drag: none;
-            user-drag: none;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jiyy Eazy — Game Hub (10 Mini Games)</title>
+  <meta name="description" content="10 mini games ringan — Jiyy Eazy Game Hub. Semua client-side, responsive, dan teks tidak bisa diseleksi."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* GLOBAL: disable text selection & image drag */
+    * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select:none; user-select:none; }
+    img, .no-drag { -webkit-user-drag: none; user-drag: none; }
+    /* basic focus outline for accessibility */
+    :focus { outline: 3px solid rgba(59,130,246,0.25); outline-offset: 2px; }
+    /* watermark */
+    #aji17mark { position: fixed; bottom: 12px; right: 12px; z-index: 9999; color: rgba(220,38,38,0.4); font-weight:700; pointer-events:none; }
+    /* small cards */
+    .card { -webkit-tap-highlight-color: transparent; }
+    /* ensure buttons are readable */
+    button { cursor: pointer; }
+  </style>
 </head>
+<body class="bg-slate-50 text-slate-800 antialiased">
 
-<body class="bg-gray-50 text-gray-800">
+  <!-- watermark -->
+  <div id="aji17mark">AJI17</div>
 
-    <!-- WATERMARK AJI17 -->
-    <div id="aji17mark">AJI17</div>
-
-    <!-- HEADER -->
-    <header class="w-full bg-white shadow-sm fixed top-0 left-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-blue-600">Jiyy<span class="text-gray-900">Eazy</span></h1>
-            <nav class="hidden md:flex gap-6">
-                <a href="#about" class="hover:text-blue-600">About</a>
-                <a href="#services" class="hover:text-blue-600">Services</a>
-                <a href="#portfolio" class="hover:text-blue-600">Portfolio</a>
-                <a href="#testimonials" class="hover:text-blue-600">Testimonials</a>
-                <a href="#quiz" class="hover:text-blue-600">Kuis</a>
-                <a href="#contact" class="hover:text-blue-600 font-semibold text-blue-600">Contact</a>
-            </nav>
+  <!-- header -->
+  <header class="bg-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold">J</div>
+        <div>
+          <div class="font-bold">Jiyy Eazy</div>
+          <div class="text-xs text-slate-500">Game Hub — 10 Mini Games</div>
         </div>
-    </header>
+      </div>
 
-    <!-- HERO -->
-    <section class="pt-28 pb-20 bg-gradient-to-br from-blue-500 to-blue-700 text-white">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10">
-            <div class="flex-1">
-                <h2 class="text-4xl font-extrabold mb-4">Jiyy Eazy: Solusi Web yang Mudah & Cepat</h2>
-                <p class="text-lg mb-6">Developer yang fokus menghadirkan website modern, ringan, intuitif, dan ramah pengguna.</p>
-                <a href="#contact" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold shadow hover:bg-gray-100">
-                    Konsultasi Gratis
-                </a>
-            </div>
+      <nav class="flex items-center gap-3">
+        <a href="#home" class="text-sm text-slate-600 hover:text-emerald-600">Home</a>
+        <a href="#games" class="text-sm text-slate-600 hover:text-emerald-600">Games</a>
+        <a href="#contact" class="text-sm text-slate-600 hover:text-emerald-600">Contact</a>
+      </nav>
+    </div>
+  </header>
 
-            <!-- FOTO PROFIL ANTI DOWNLOAD -->
-            <div class="relative mx-auto">
-                <div 
-                    class="w-48 h-48 rounded-full border-4 border-white shadow-xl bg-cover bg-center no-select profile-protect profile-img"
-                    style="background-image: url('https://files.catbox.moe/byftzo.jpg');">
-                </div>
-            </div>
+  <main class="max-w-6xl mx-auto px-4 py-8">
 
+    <!-- hero -->
+    <section id="home" class="mb-8">
+      <div class="bg-gradient-to-r from-emerald-400 to-blue-500 text-white p-6 rounded-lg flex flex-col md:flex-row items-center gap-6">
+        <div class="flex-1">
+          <h1 class="text-2xl md:text-3xl font-extrabold">Jiyy Eazy — Mini Game Hub</h1>
+          <p class="mt-2 text-sm md:text-base text-white/90">10 game ringan untuk hiburan dan demo kemampuan JavaScript. Semua client-side. Tekan tab "Games" dan pilih permainan.</p>
+          <div class="mt-4 flex gap-2">
+            <a href="#games" class="bg-white text-slate-800 px-4 py-2 rounded shadow text-sm">MULAI MAIN</a>
+            <a href="#contact" class="border border-white/40 px-4 py-2 rounded text-sm">KONTAK</a>
+          </div>
         </div>
+
+        <div class="w-36 h-36 rounded-full bg-white/30 flex items-center justify-center">
+          <div class="w-28 h-28 rounded-full bg-cover bg-center" style="background-image:url('https://files.catbox.moe/byftzo.jpg')"></div>
+        </div>
+      </div>
     </section>
 
-    <!-- ABOUT -->
-    <section id="about" class="py-20">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h3 class="text-3xl font-semibold mb-6">Tentang Jiyy Eazy</h3>
-            <p class="text-gray-600 leading-relaxed">
-                Saya adalah developer yang senang membuat solusi cepat dan mudah.  
-                Keahlian saya mencakup:  
-                <span class="font-semibold text-blue-600">HTML5, CSS3, JavaScript (ES6+), Tailwind CSS, API Integration, Web Optimization, UI/UX Simple Style.</span>
-            </p>
-        </div>
+    <!-- games navigation -->
+    <section id="games" class="mb-6">
+      <h2 class="text-xl font-semibold mb-3">Daftar Game (10)</h2>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <!-- list of games -->
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="1">1. Tebak Angka</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="2">2. Batu-Gunting-Kertas</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="3">3. Memory Pair</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="4">4. Reaction Time</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="5">5. Trivia (MCQ)</button>
+
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="6">6. Color Match</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="7">7. Whack-a-Box</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="8">8. Emoji Recall</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="9">9. Hitung Bentuk</button>
+        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="10">10. Typing Sprint</button>
+      </div>
     </section>
 
-    <!-- SERVICES -->
-    <section id="services" class="py-20 bg-gray-100">
-        <div class="max-w-6xl mx-auto px-6">
-            <h3 class="text-3xl font-semibold text-center mb-10">Layanan</h3>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="p-6 bg-white rounded-xl shadow hover:-translate-y-1 transition">
-                    <h4 class="font-bold mb-2 text-blue-600">Pembuatan Website</h4>
-                    <p>Website modern, responsif, dan cepat dibuat.</p>
-                </div>
-
-                <div class="p-6 bg-white rounded-xl shadow hover:-translate-y-1 transition">
-                    <h4 class="font-bold mb-2 text-blue-600">Optimasi Kecepatan</h4>
-                    <p>Bikin website lebih cepat & ringan.</p>
-                </div>
-
-                <div class="p-6 bg-white rounded-xl shadow hover:-translate-y-1 transition">
-                    <h4 class="font-bold mb-2 text-blue-600">UI/UX Eazy Style</h4>
-                    <p>Desain bersih, cerah, dan mudah dipahami.</p>
-                </div>
-            </div>
+    <!-- game stage -->
+    <section id="stage" class="mb-8">
+      <div class="bg-white rounded-lg p-6 shadow">
+        <div id="gameTitle" class="text-lg font-semibold mb-4">Pilih game untuk mulai</div>
+        <div id="gameArea">
+          <p class="text-sm text-slate-600">Klik salah satu tombol game di atas untuk memulai. Semua game bekerja offline dan di client.</p>
         </div>
+
+        <div class="mt-4">
+          <button id="resetGame" class="px-3 py-2 bg-emerald-500 text-white rounded hidden">Reset Game</button>
+        </div>
+      </div>
     </section>
 
-    <!-- PORTFOLIO -->
-    <section id="portfolio" class="py-20">
-        <div class="max-w-6xl mx-auto px-6 text-center">
-            <h3 class="text-3xl font-semibold mb-10">Portfolio</h3>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-gray-200 h-40 rounded-lg"></div>
-                <div class="bg-gray-300 h-40 rounded-lg"></div>
-                <div class="bg-gray-200 h-40 rounded-lg"></div>
-            </div>
-        </div>
+    <!-- small tips -->
+    <section class="mb-8">
+      <div class="bg-white p-4 rounded-lg border text-sm text-slate-600">
+        <strong>Catatan:</strong> teks tidak bisa diseleksi atau disalin (sesuai permintaan). Jika ada bug, refresh halaman untuk reset semua game.
+      </div>
     </section>
 
-    <!-- TESTIMONIALS -->
-    <section id="testimonials" class="py-20 bg-gray-100">
-        <div class="max-w-5xl mx-auto px-6">
-            <h3 class="text-3xl font-semibold text-center mb-10">Apa Kata Klien?</h3>
-
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <p class="italic">"Gampang banget dipakai, hasilnya cepat dan rapi!"</p>
-                    <span class="font-bold block mt-3">— Client A</span>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <p class="italic">"Solusinya simple tapi powerful. Recommended."</p>
-                    <span class="font-bold block mt-3">— Client B</span>
-                </div>
-            </div>
-        </div>
+    <!-- contact -->
+    <section id="contact" class="mb-8">
+      <div class="bg-emerald-50 p-6 rounded-lg">
+        <h3 class="font-semibold">Kontak</h3>
+        <p class="text-sm text-slate-600">Email: <span class="font-mono">hi@jiyy-eazy.example</span></p>
+      </div>
     </section>
 
-    <!-- KUIS -->
-    <section id="quiz" class="py-20">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h3 class="text-3xl font-semibold mb-10 text-blue-600">Kuis Tebak Gambar</h3>
+  </main>
 
-            <div class="bg-white shadow-xl p-8 rounded-xl">
-                <img id="quizImg" src="https://picsum.photos/300?random=1" class="mx-auto rounded-xl mb-6 shadow no-select profile-protect">
-                
-                <input id="answer" type="text" placeholder="Tebak benda pada gambar..." 
-                       class="w-full px-4 py-3 border rounded-lg mb-4">
+  <!-- footer -->
+  <footer class="text-center py-6 text-slate-500 text-sm">© <span id="yr"></span> Jiyy Eazy • All Rights Reserved</footer>
 
-                <button onclick="checkAnswer()" 
-                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold shadow hover:bg-blue-700">
-                    Cek Jawaban
-                </button>
+  <!-- scripts -->
+  <script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
 
-                <p id="quizResult" class="mt-4 font-semibold"></p>
-            </div>
-        </div>
-    </section>
+  // prevent context menu
+  window.addEventListener('contextmenu', e => e.preventDefault());
 
-    <script>
-        function checkAnswer() {
-            let ans = document.getElementById("answer").value;
-            let result = document.getElementById("quizResult");
+  // utilities
+  const byId = id => document.getElementById(id);
+  const gameArea = document.getElementById('gameArea');
+  const gameTitle = document.getElementById('gameTitle');
+  const resetBtn = document.getElementById('resetGame');
 
-            if (!ans.trim()) {
-                result.innerHTML = "⚠️ Isi jawaban dulu dong.";
-                result.className = "text-red-600 mt-4";
-                return;
+  // switcher
+  document.querySelectorAll('[data-game]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = Number(btn.getAttribute('data-game'));
+      startGame(id);
+    });
+  });
+
+  // store active game id and state
+  let activeGame = null;
+  let gameState = {};
+
+  // Reset handler
+  resetBtn.addEventListener('click', () => {
+    if (activeGame) startGame(activeGame, true);
+  });
+
+  // Helpers for DOM creation
+  function el(tag, attrs={}, children=[]) {
+    const e = document.createElement(tag);
+    for (const k in attrs) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else if (k === 'html') e.innerHTML = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    if (!Array.isArray(children)) children = [children];
+    children.forEach(c => { if (typeof c === 'string') e.appendChild(document.createTextNode(c)); else if (c) e.appendChild(c); });
+    return e;
+  }
+
+  /* ===========================
+     Game 1 - Tebak Angka
+     =========================== */
+  function game1(container, reset=false) {
+    gameTitle.textContent = '1. Tebak Angka (1 - 100)';
+    if (reset || !gameState.g1) {
+      gameState.g1 = { target: Math.floor(Math.random()*100)+1, attempts:0 };
+    }
+    const state = gameState.g1;
+    container.innerHTML = '';
+    const info = el('div',{class:'mb-3 text-slate-600'},`Saya sudah memilih angka antara 1 - 100. Tebak!`);
+    const input = el('input',{class:'border px-3 py-2 rounded w-48','type':'number','placeholder':'Masukkan angka'});
+    const btn = el('button',{class:'ml-2 px-3 py-2 bg-emerald-500 text-white rounded'},'Tebak');
+    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+
+    btn.addEventListener('click', ()=>{
+      const v = Number(input.value);
+      if (!v) { out.textContent = 'Masukkan angka valid.'; return; }
+      state.attempts++;
+      if (v === state.target) {
+        out.textContent = `Benar! Angka ${v}. Jumlah percobaan: ${state.attempts}.`;
+        out.className = 'mt-3 text-sm text-emerald-600';
+      } else if (v < state.target) {
+        out.textContent = 'Terlalu kecil.';
+      } else {
+        out.textContent = 'Terlalu besar.';
+      }
+    });
+
+    container.append(info, input, btn, out);
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* ===========================
+     Game 2 - Batu Gunting Kertas
+     =========================== */
+  function game2(container, reset=false) {
+    gameTitle.textContent = '2. Batu-Gunting-Kertas';
+    const choices = ['Batu','Gunting','Kertas'];
+    container.innerHTML = '';
+    const info = el('div',{class:'mb-3 text-slate-600'},'Pilih salah satu:');
+    const buttons = el('div',{class:'flex gap-2'});
+    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+
+    choices.forEach(c=>{
+      const b = el('button',{class:'px-3 py-2 bg-slate-100 rounded hover:bg-slate-200'},c);
+      b.addEventListener('click', ()=>{
+        const comp = choices[Math.floor(Math.random()*3)];
+        let res = 'Seri';
+        if ((c==='Batu'&&comp==='Gunting')||(c==='Gunting'&&comp==='Kertas')||(c==='Kertas'&&comp==='Batu')) res='Kamu Menang!';
+        else if (c===comp) res='Seri';
+        else res='Kamu Kalah';
+        out.textContent = `Kamu: ${c} — Komputer: ${comp} → ${res}`;
+      });
+      buttons.appendChild(b);
+    });
+
+    container.append(info, buttons, out);
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* ===========================
+     Game 3 - Memory Pair (4x3)
+     =========================== */
+  function game3(container, reset=false) {
+    gameTitle.textContent = '3. Memory Pair (Cocokkan pasangan)';
+    container.innerHTML = '';
+    const size = 12; // 6 pairs
+    if (!gameState.g3 || reset) {
+      // generate pairs
+      const icons = ['🍎','🍌','🍇','🍓','🍍','🥝'];
+      let arr = icons.concat(icons);
+      arr = arr.sort(()=>Math.random()-0.5);
+      gameState.g3 = { arr, revealed: Array(size).fill(false), matched: Array(size).fill(false), first:null, moves:0 };
+    }
+    const state = gameState.g3;
+    const grid = el('div',{class:'grid grid-cols-4 gap-3'});
+    const status = el('div',{class:'mt-3 text-sm text-slate-700'},`Moves: ${state.moves}`);
+
+    function render() {
+      grid.innerHTML='';
+      for (let i=0;i<size;i++) {
+        const cell = el('button',{class:'h-20 bg-slate-100 rounded text-2xl flex items-center justify-center'}, state.matched[i]? state.arr[i] : (state.revealed[i]? state.arr[i] : ''));
+        if (!state.matched[i] && !state.revealed[i]) cell.textContent = '';
+        cell.addEventListener('click', ()=>{
+          if (state.matched[i] || state.revealed[i]) return;
+          state.revealed[i]=true;
+          if (state.first===null) {
+            state.first=i;
+            render();
+            return;
+          } else {
+            const j = state.first;
+            state.moves++;
+            render();
+            if (state.arr[i]===state.arr[j]) {
+              state.matched[i]=state.matched[j]=true;
+              state.first=null;
+            } else {
+              // hide after short delay
+              setTimeout(()=>{ state.revealed[i]=state.revealed[j]=false; state.first=null; render(); },700);
             }
+            status.textContent = `Moves: ${state.moves}`;
+            // win check
+            if (state.matched.every(Boolean)) {
+              status.textContent = `Selesai! Moves: ${state.moves}`;
+            }
+          }
+        });
+        grid.appendChild(cell);
+      }
+    }
 
-            result.innerHTML = "✔️ Jawaban diterima!";
-            result.className = "text-green-600 mt-4";
+    render();
+    container.append(grid, status);
+    resetBtn.classList.remove('hidden');
+  }
 
-            document.getElementById("quizImg").src = "https://picsum.photos/300?random=" + Math.random();
-            document.getElementById("answer").value = "";
+  /* ===========================
+     Game 4 - Reaction Time
+     =========================== */
+  function game4(container, reset=false) {
+    gameTitle.textContent = '4. Reaction Time';
+    container.innerHTML = '';
+    if (!gameState.g4 || reset) gameState.g4 = { running:false, start:0, best: null };
+
+    const state = gameState.g4;
+    const info = el('div',{class:'mb-3 text-slate-600'},'Tunggu layar berubah warna, lalu klik secepat mungkin.');
+    const panel = el('div',{class:'w-full h-40 bg-slate-100 rounded flex items-center justify-center text-xl font-medium'},'Klik untuk mulai');
+    const best = el('div',{class:'mt-3 text-sm text-slate-700'}, state.best ? `Best: ${state.best} ms` : 'Belum ada best');
+
+    let timeoutId = null;
+
+    function startRound() {
+      panel.textContent = 'Bersiap...';
+      panel.className = 'w-full h-40 bg-slate-100 rounded flex items-center justify-center text-xl font-medium';
+      timeoutId = setTimeout(()=> {
+        state.start = performance.now();
+        state.running = true;
+        panel.textContent = 'Klik!';
+        panel.className = 'w-full h-40 bg-emerald-400 rounded flex items-center justify-center text-xl font-medium text-white';
+      }, 800 + Math.random()*2000);
+    }
+
+    panel.addEventListener('click', ()=>{
+      if (!state.running && timeoutId===null) {
+        // start
+        startRound();
+        timeoutId = 'started';
+        return;
+      }
+      if (state.running) {
+        const delta = Math.round(performance.now() - state.start);
+        panel.textContent = `${delta} ms`;
+        state.running = false;
+        timeoutId = null;
+        if (!state.best || delta < state.best) state.best = delta;
+        best.textContent = `Best: ${state.best} ms`;
+        // auto new round after short delay
+        setTimeout(()=> startRound(), 800);
+      } else {
+        // clicked too early
+        panel.textContent = 'Terlalu cepat! Mulai lagi';
+        clearTimeout(timeoutId);
+        timeoutId = null;
+        setTimeout(()=> startRound(), 800);
+      }
+    });
+
+    container.append(info, panel, best);
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* ===========================
+     Game 5 - Trivia MCQ
+     =========================== */
+  function game5(container, reset=false) {
+    gameTitle.textContent = '5. Trivia (MCQ)';
+    container.innerHTML = '';
+    const questions = [
+      {q:'Apa ibu kota Indonesia?', opts:['Bandung','Jakarta','Surabaya','Medan'], a:1},
+      {q:'Bahasa pemrograman utama untuk web frontend?', opts:['Python','C++','JavaScript','Rust'], a:2},
+      {q:'Siapa yang memelihara server web?', opts:['Developer','DBA','Designer','Koki'], a:0}
+    ];
+    if (!gameState.g5 || reset) gameState.g5 = { idx:0, score:0 };
+    const state = gameState.g5;
+
+    function render() {
+      container.innerHTML='';
+      const cur = questions[state.idx];
+      const qEl = el('div',{class:'font-semibold mb-3'},`Q${state.idx+1}: ${cur.q}`);
+      const opts = el('div',{class:'grid gap-2'});
+      cur.opts.forEach((opt,i)=>{
+        const b = el('button',{class:'p-2 bg-slate-100 rounded text-left'}, opt);
+        b.addEventListener('click', ()=>{
+          if (i===cur.a) state.score++;
+          state.idx++;
+          if (state.idx>=questions.length) {
+            container.innerHTML = '';
+            container.append(el('div',{class:'text-lg font-semibold'},`Selesai! Score: ${state.score}/${questions.length}`),
+                             el('button',{class:'mt-3 px-3 py-2 bg-emerald-500 text-white rounded'},'Main lagi'));
+            container.querySelector('button').addEventListener('click', ()=> { gameState.g5 = null; game5(container,true); });
+            resetBtn.classList.remove('hidden');
+            return;
+          }
+          render();
+        });
+        opts.appendChild(b);
+      });
+      container.append(qEl, opts);
+    }
+    render();
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* ===========================
+     Game 6 - Color Match
+     =========================== */
+  function game6(container, reset=false) {
+    gameTitle.textContent = '6. Color Match (Ketik warna teks, bukan warna font)';
+    container.innerHTML = '';
+    const colors = ['RED','GREEN','BLUE','YELLOW','PURPLE','ORANGE'];
+    function nextRound() {
+      const colorName = colors[Math.floor(Math.random()*colors.length)];
+      let colorVal = colors[Math.floor(Math.random()*colors.length)];
+      // ensure mismatch sometimes
+      if (Math.random() > 0.5) colorVal = colorName;
+      const word = el('div',{class:'text-3xl font-bold mb-3', style:`color:${colorVal.toLowerCase()}`}, colorName);
+      const input = el('input',{class:'border px-3 py-2 rounded','placeholder':'Ketik nama warna (contoh: red)'});
+      const btn = el('button',{class:'ml-2 px-3 py-2 bg-emerald-500 text-white rounded'},'Cek');
+      const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+
+      return {word,input,btn,out};
+    }
+
+    const containerBox = el('div',{});
+    let round = nextRound();
+    containerBox.append(round.word, round.input, round.btn, round.out);
+    round.btn.addEventListener('click', ()=>{
+      const guess = round.input.value.trim().toUpperCase();
+      if (!guess) { round.out.textContent = 'Isi dulu'; return; }
+      // correct if matches the color word shown (i.e., the 'color of text' value)
+      // we check the computed style color of element word
+      const computed = getComputedStyle(round.word).color;
+      // map computed rgb to color name simplified
+      const mapping = {
+        'rgb(255, 0, 0)':'RED','rgb(0, 128, 0)':'GREEN','rgb(0, 0, 255)':'BLUE',
+        'rgb(255, 255, 0)':'YELLOW','rgb(128, 0, 128)':'PURPLE','rgb(255, 165, 0)':'ORANGE'
+      };
+      const actual = mapping[computed] || computed;
+      if (guess === actual) round.out.textContent = 'Benar!';
+      else round.out.textContent = `Salah. Warna sebenarnya: ${actual}`;
+      // new round
+      setTimeout(()=> {
+        containerBox.innerHTML = '';
+        round = nextRound();
+        containerBox.append(round.word, round.input, round.btn, round.out);
+      }, 900);
+    });
+
+    container.append(containerBox);
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* ===========================
+     Game 7 - Whack-a-Box
+     =========================== */
+  function game7(container, reset=false) {
+    gameTitle.textContent = '7. Whack-a-Box (Klik kotak muncul)';
+    container.innerHTML = '';
+    if (!gameState.g7 || reset) gameState.g7 = { score:0, time:15, running:false, interval:null };
+    const state = gameState.g7;
+    const info = el('div',{class:'mb-3 text-slate-600'},`Klik kotak kuning sebanyak-banyaknya dalam ${state.time} detik`);
+    const board = el('div',{class:'grid grid-cols-4 gap-2'});
+    for (let i=0;i<8;i++){
+      const cell = el('div',{class:'h-20 bg-slate-100 rounded flex items-center justify-center text-2xl'});
+      board.appendChild(cell);
+    }
+    const scoreEl = el('div',{class:'mt-3 text-sm text-slate-700'},`Score: ${state.score}`);
+    const timerEl = el('div',{class:'mt-1 text-sm text-slate-700'},`Time: ${state.time}s`);
+    const start = el('button',{class:'mt-3 px-3 py-2 bg-emerald-500 text-white rounded'},'Start');
+
+    function spawn() {
+      // clear
+      [...board.children].forEach(c=>{ c.textContent=''; c.classList.remove('bg-yellow-300'); });
+      const i = Math.floor(Math.random()*board.children.length);
+      const item = board.children[i];
+      item.classList.add('bg-yellow-300');
+      item.textContent = '🔥';
+      item.addEventListener('click', hit);
+      setTimeout(()=>{ if (item) { item.textContent=''; item.classList.remove('bg-yellow-300'); item.removeEventListener('click', hit); } }, 900);
+    }
+
+    function hit(e) {
+      state.score++; scoreEl.textContent = `Score: ${state.score}`;
+      e.currentTarget.textContent=''; e.currentTarget.classList.remove('bg-yellow-300');
+      e.currentTarget.removeEventListener('click', hit);
+    }
+
+    start.addEventListener('click', ()=>{
+      if (state.running) return;
+      state.running = true;
+      state.score = 0; state.time = 15;
+      scoreEl.textContent = `Score: ${state.score}`; timerEl.textContent = `Time: ${state.time}s`;
+      state.interval = setInterval(()=> {
+        spawn();
+      }, 700);
+      const countdown = setInterval(()=> {
+        state.time--; timerEl.textContent = `Time: ${state.time}s`;
+        if (state.time<=0) {
+          clearInterval(countdown);
+          clearInterval(state.interval);
+          state.running=false;
+          alert(`Waktu habis! Score: ${state.score}`);
         }
-    </script>
+      },1000);
+    });
 
-    <!-- CONTACT -->
-    <section id="contact" class="py-20 bg-blue-700 text-white">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h3 class="text-3xl font-semibold mb-6">Hubungi Jiyy Developer</h3>
+    container.append(info, board, scoreEl, timerEl, start);
+    resetBtn.classList.remove('hidden');
+  }
 
-            <p class="mb-6">Siap bantu kamu bikin solusi web yang modern & ringan!</p>
+  /* ===========================
+     Game 8 - Emoji Recall
+     =========================== */
+  function game8(container, reset=false) {
+    gameTitle.textContent = '8. Emoji Recall (ingat urutan)';
+    container.innerHTML = '';
+    const pool = ['😀','🍎','⚽','🚗','🐶','🌟','🎵','🍩'];
+    if (!gameState.g8 || reset) gameState.g8 = { seq:[], level:1, user:[], stage:'show' };
+    const state = gameState.g8;
 
-            <a href="mailto:jiyyeazy@example.com" 
-               class="bg-white text-blue-700 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-200">
-               Kirim Email
-            </a>
-        </div>
-    </section>
+    const info = el('div',{class:'mb-3 text-slate-600'},'Tonton urutan emoji, lalu ulangi klik urutan yang sama.');
+    const box = el('div',{class:'grid grid-cols-8 gap-2 mb-3'});
+    pool.forEach(em=>{
+      const b = el('button',{class:'h-12 rounded bg-slate-100 text-xl'}, em);
+      b.addEventListener('click', ()=>{
+        if (state.stage !== 'input') return;
+        state.user.push(em);
+        // check prefix
+        const idx = state.user.length - 1;
+        if (state.user[idx] !== state.seq[idx]) {
+          alert('Salah urutan! Game over.');
+          gameState.g8 = null; game8(container,true);
+          return;
+        }
+        if (state.user.length === state.seq.length) {
+          // level up
+          state.level++;
+          state.user=[];
+          startRound();
+        }
+      });
+      box.appendChild(b);
+    });
 
-    <!-- FOOTER -->
-    <footer class="py-6 text-center text-gray-600">
-        © 2025 Jiyy Eazy • All Rights Reserved
-    </footer>
+    function startRound() {
+      state.seq = [];
+      for (let i=0;i<state.level;i++) state.seq.push(pool[Math.floor(Math.random()*pool.length)]);
+      // show sequence
+      state.stage='show';
+      let i=0;
+      const display = el('div',{class:'text-3xl mb-3'},'');
+      container.querySelectorAll('.display')?.forEach(n=>n.remove?.());
+      container.insertBefore(display, box);
+      const interval = setInterval(()=> {
+        display.textContent = state.seq[i];
+        i++;
+        if (i>=state.seq.length) {
+          clearInterval(interval);
+          display.textContent = 'Sekarang giliranmu...';
+          state.stage='input';
+        }
+      }, 700);
+    }
 
-    <script>
-        // Proteksi tambahan: blok klik kanan
-        document.addEventListener("contextmenu", e => e.preventDefault());
-    </script>
+    container.append(info, box);
+    startRound();
+    resetBtn.classList.remove('hidden');
+  }
 
+  /* ===========================
+     Game 9 - Hitung Bentuk
+     =========================== */
+  function game9(container, reset=false) {
+    gameTitle.textContent = '9. Hitung Bentuk (Berapa banyak lingkaran?)';
+    container.innerHTML = '';
+    function generate() {
+      const total = 6 + Math.floor(Math.random()*6); // 6..11
+      const circles = Math.floor(3 + Math.random()*5); // 3..7
+      // build grid with mix of circles & squares
+      const items = [];
+      for (let i=0;i<total;i++) items.push(i<circles? 'circle' : 'square');
+      // shuffle
+      items.sort(()=>Math.random()-0.5);
+      return {items, circles};
+    }
+    const g = generate();
+    const grid = el('div',{class:'grid grid-cols-6 gap-2'});
+    g.items.forEach(t=>{
+      const cell = el('div',{class:'h-12 flex items-center justify-center rounded'});
+      if (t==='circle') {
+        cell.className += ' bg-emerald-300 rounded-full';
+      } else {
+        cell.className += ' bg-slate-300';
+      }
+      grid.appendChild(cell);
+    });
+    const prompt = el('div',{class:'mb-3 text-slate-700'},'Berapa banyak lingkaran?');
+    const input = el('input',{class:'border px-3 py-2 rounded w-32','type':'number','placeholder':'Jawaban'});
+    const btn = el('button',{class:'ml-2 px-3 py-2 bg-emerald-500 text-white rounded'},'Cek');
+    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+
+    btn.addEventListener('click', ()=>{
+      const v = Number(input.value);
+      if (v===g.circles) out.textContent = `Benar! Ada ${g.circles} lingkaran.`;
+      else out.textContent = `Salah. Jawaban: ${g.circles}.`;
+    });
+
+    container.append(prompt, grid, input, btn, out);
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* ===========================
+     Game 10 - Typing Sprint
+     =========================== */
+  function game10(container, reset=false) {
+    gameTitle.textContent = '10. Typing Sprint (Ketik kalimat secepat mungkin)';
+    container.innerHTML = '';
+    const sentences = [
+      'aku suka coding',
+      'jangan lupa senyum hari ini',
+      'website cepat itu penting',
+      'jaga kualitas, kerja cepat'
+    ];
+    if (!gameState.g10 || reset) gameState.g10 = { sentence: sentences[Math.floor(Math.random()*sentences.length)], start:0, running:false };
+    const state = gameState.g10;
+    const prompt = el('div',{class:'mb-3 font-semibold'}, state.sentence);
+    const input = el('input',{class:'border px-3 py-2 rounded w-full','placeholder':'Ketik di sini...'});
+    const btn = el('button',{class:'mt-3 px-3 py-2 bg-emerald-500 text-white rounded'},'Mulai / Submit');
+    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+
+    btn.addEventListener('click', ()=> {
+      if (!state.running) {
+        state.running = true;
+        state.start = performance.now();
+        out.textContent = 'Waktu berjalan...';
+        btn.textContent = 'Submit';
+        input.focus();
+        return;
+      }
+      const elapsed = Math.round(performance.now() - state.start);
+      const typed = input.value.trim();
+      if (typed === state.sentence) out.textContent = `Benar! Waktu: ${elapsed} ms`;
+      else out.textContent = `Teks tidak cocok. Waktu: ${elapsed} ms (coba lagi)`;
+      state.running=false;
+      btn.textContent='Mulai / Submit';
+    });
+
+    container.append(prompt, input, btn, out);
+    resetBtn.classList.remove('hidden');
+  }
+
+  /* START GAME SELECTOR */
+  function startGame(id, forceReset=false) {
+    activeGame = id;
+    gameArea.innerHTML = '';
+    // map id to fn
+    switch(id) {
+      case 1: game1(gameArea, forceReset); break;
+      case 2: game2(gameArea, forceReset); break;
+      case 3: game3(gameArea, forceReset); break;
+      case 4: game4(gameArea, forceReset); break;
+      case 5: game5(gameArea, forceReset); break;
+      case 6: game6(gameArea, forceReset); break;
+      case 7: game7(gameArea, forceReset); break;
+      case 8: game8(gameArea, forceReset); break;
+      case 9: game9(gameArea, forceReset); break;
+      case 10: game10(gameArea, forceReset); break;
+      default: gameArea.textContent = 'Game belum tersedia.'; resetBtn.classList.add('hidden');
+    }
+  }
+
+  // Accessibility: close any modal / reset on Escape -> just reset active game state to initial (soft)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // reset active game
+      if (activeGame) startGame(activeGame, true);
+    }
+  });
+
+  // Prevent long-touch saving images on mobile by using CSS; extra precaution:
+  document.querySelectorAll('img').forEach(i => {
+    i.addEventListener('dragstart', e => e.preventDefault());
+  });
+
+  </script>
 </body>
 </html>
