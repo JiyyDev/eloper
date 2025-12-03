@@ -3,174 +3,236 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jiyy Eazy — Realtime Visitor Counter</title>
+  <title>Jiyy Eazy — Glass Pro (All Features)</title>
 
-  <!-- Chart.js & GSAP -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
   <style>
-    /* ---------------- Reset & base ---------------- */
+    /* ================== Reset & Base ================== */
     :root{
-      --bg:#071026; --card:#0b1630; --muted:#94a3b8; --accent:#7c3aed; --accent2:#06b6d4; --glass:rgba(255,255,255,0.04); --text:#e6eef8;
+      --bg:linear-gradient(180deg, rgba(4,8,20,1), rgba(4,8,20,0.95));
+      --card-bg: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.06);
+      --muted: rgba(225,230,240,0.6);
+      --accent-a: #8B5CF6; /* purple */
+      --accent-b: #06B6D4; /* teal */
+      --accent-grad: linear-gradient(90deg,#8B5CF6,#06B6D4);
+      --text: #eaf2ff;
     }
-    .light{ --bg:#f6f8fb; --card:#ffffff; --muted:#566270; --accent:#6d28d9; --accent2:#0891b2; --glass:rgba(2,6,23,0.03); --text:#061226; }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial;
-      background:linear-gradient(180deg,var(--bg), #071029); color:var(--text);
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-      padding:28px; transition:background .25s,color .25s;
-      -webkit-tap-highlight-color: transparent; /* remove mobile blue */
-    }
-    /* remove selection highlight (blue) */
-    ::selection{ background: transparent; color: inherit; }
-    /* custom focus */
-    :focus{ outline: none; box-shadow: 0 0 0 4px rgba(124,58,237,0.12); border-radius:6px; }
+    *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none;}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:var(--bg);color:var(--text)}
+    ::selection{ background: rgba(139,92,246,0.12); color: inherit;}
+    :focus{ outline: none; box-shadow: 0 0 0 4px rgba(139,92,246,0.12); border-radius:6px;}
 
-    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:white;box-shadow:0 8px 30px rgba(3,7,18,0.6)}
-    h1{margin:0;font-size:20px}
-    .controls{display:flex;gap:10px;align-items:center}
-    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--text);font-size:14px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:18px;border-radius:14px;box-shadow:0 8px 26px rgba(2,6,23,0.45);backdrop-filter: blur(6px);}
+    /* ================== Layout ================== */
+    .app { max-width:1200px; margin:20px auto; display:grid; grid-template-columns: 280px 1fr 360px; gap:18px; padding:12px; align-items:start; }
+    @media (max-width:1100px) { .app { grid-template-columns: 1fr; } .side-right, .side-left { order: 2 } .main { order: 1 } }
 
-    .hero{display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:12px}
-    .big-counter{font-size:56px;font-weight:800;letter-spacing:1px}
-    .meta{color:var(--muted);font-size:13px}
-    .row{display:flex;gap:12px;align-items:center}
-    input[type=text]{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;font-size:14px;background:transparent;color:var(--text)}
-    input::placeholder{color:#98aac5;opacity:0.9}
-    .chart-card{padding:14px}
-    canvas{max-width:100%}
-    .side{display:flex;flex-direction:column;gap:12px}
-    .small{font-size:13px;color:var(--muted)}
-    .share{display:flex;gap:8px}
-    .share a{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--text);background:var(--glass);font-size:14px}
-    footer{grid-column:1 / -1;margin-top:18px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
-    @media (max-width:980px){.wrap{grid-template-columns:1fr} .logo{width:44px;height:44px}}
+    /* ================== Cards & Glass ================== */
+    .card { background: var(--card-bg); border-radius:14px; padding:14px; border:1px solid var(--glass-border); backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(2,6,23,0.5); }
+    .logo { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--accent-grad); color:white; font-weight:800; box-shadow:0 8px 30px rgba(99,102,241,0.12);}
+
+    /* ================== Left (login & presence) ================== */
+    .side-left { padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .label { font-size:13px; color:var(--muted); margin-bottom:6px; }
+    .input-card { display:flex; gap:10px; align-items:center; padding:8px 10px; border-radius:12px; background: rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.03); }
+    .input-card svg { width:20px; height:20px; flex:0 0 20px; }
+    .text-input { flex:1; padding:10px; border-radius:8px; border:none; background:transparent; color:var(--text); font-size:14px; outline:none; }
+    .btn { padding:10px 12px; border-radius:10px; cursor:pointer; border:none; font-weight:700; color:white; background:var(--accent-grad); box-shadow:0 8px 28px rgba(139,92,246,0.12); }
+    .btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--text); }
+
+    .stat { display:flex; gap:10px; align-items:center; }
+    .stat .num { font-weight:800; font-size:22px; }
+
+    /* ================== Main ================== */
+    .main { padding:18px; display:flex; flex-direction:column; gap:12px; }
+    .hero { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .big-counter { font-size:56px; font-weight:900; color: #e8d9ff; text-shadow: 0 10px 30px rgba(139,92,246,0.12); }
+    .meta { color:var(--muted); font-size:13px; }
+
+    .controls { display:flex; gap:8px; align-items:center; }
+
+    /* chart */
+    .chart-area { height:260px; padding:10px; }
+
+    /* ================== Right (chat & leaderboard) ================== */
+    .side-right { padding:14px; display:flex; flex-direction:column; gap:12px; }
+    .messages { height:360px; overflow:auto; padding:8px; border-radius:10px; background: rgba(0,0,0,0.12); }
+    .msg { padding:8px; border-radius:10px; margin-bottom:8px; max-width:90%; }
+    .msg.me { background: linear-gradient(90deg,#8B5CF6,#06B6D4); color:white; margin-left:auto; }
+    .msg.other { background: rgba(255,255,255,0.03); color:var(--text); margin-right:auto; }
+
+    .chat-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    .chat-row .text { flex:1; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); background:transparent; color:var(--text); }
+
+    .leadboard-list { max-height:160px; overflow:auto; padding:8px; border-radius:8px; background: rgba(255,255,255,0.02); }
+
+    /* ================== Footer small ================== */
+    footer { margin-top:18px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div>
-      <header>
-        <div class="brand">
-          <div class="logo">JZ</div>
+
+  <!-- APP HEADER -->
+  <div style="max-width:1200px;margin:14px auto;padding:12px">
+    <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="logo">JZ</div>
+        <div>
+          <div style="font-weight:900;font-size:18px">Jiyy Eazy · Glass Pro</div>
+          <div class="meta">Realtime dashboard • Firebase Realtime DB</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="shareBtn" class="btn">Share</button>
+      </div>
+    </header>
+
+    <div class="app">
+
+      <!-- LEFT: Login, presence, stats -->
+      <aside class="side-left card">
+        <div>
+          <div style="font-weight:800">Profil & Masuk</div>
+          <div class="meta">Masukkan nama untuk masuk ke dashboard</div>
+        </div>
+
+        <!-- Card-style input (as requested) -->
+        <div class="input-card" style="margin-top:10px">
+          <!-- Inline flat icon (user) -->
+          <svg viewBox="0 0 24 24" fill="#ffd6e8" xmlns="http://www.w3.org/2000/svg"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"/></svg>
+          <input id="nameInput" class="text-input" placeholder="Nama kamu (mis: Bintang)" />
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="enterBtn" class="btn" style="flex:1">Masuk</button>
+          <button id="logoutBtn" class="btn ghost">Keluar</button>
+        </div>
+
+        <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.04);margin:12px 0">
+
+        <div>
+          <div class="meta">Total Pengunjung</div>
+          <div class="stat"><div style="width:42px;height:42;border-radius:8px;background:linear-gradient(90deg,#ffb86b,#ff6b6b);display:flex;align-items:center;justify-content:center;margin-right:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zM2 22a10 10 0 0 1 20 0H2z"/></svg></div><div><div class="num" id="totalCount">0</div><div class="small">semenit lalu</div></div></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="meta">Online Sekarang</div>
+          <div class="stat"><div style="width:42px;height:42;border-radius:8px;background:linear-gradient(90deg,#6ee7b7,#34d399);display:flex;align-items:center;justify-content:center;margin-right:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="8"/></svg></div><div><div class="num" id="onlineCount">0</div><div class="small">sedang aktif</div></div></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="meta">Last visit (local)</div>
+          <div id="localLast" class="small">-</div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="meta">Activity feed</div>
+          <div id="feed" class="small" style="max-height:140px;overflow:auto;padding:8px;border-radius:8px;background:rgba(255,255,255,0.015)"></div>
+        </div>
+      </aside>
+
+      <!-- CENTER: main -->
+      <main class="main card">
+        <div class="hero">
           <div>
-            <h1>Jiyy Eazy</h1>
-            <div class="meta">Realtime visitor counter • Firebase Realtime DB</div>
-          </div>
-        </div>
-        <div class="controls">
-          <button id="themeToggle" class="btn" aria-pressed="false">Toggle Theme</button>
-          <button id="resetBtn" class="btn">Reset Local</button>
-        </div>
-      </header>
-
-      <section class="card hero" aria-labelledby="heroTitle">
-        <div class="row" style="justify-content:space-between;align-items:flex-start">
-          <div>
-            <div id="heroTitle" class="big-counter" aria-live="polite">0</div>
-            <div class="meta">Total pengunjung (global)</div>
+            <div class="meta">Pesan</div>
+            <div class="big-counter" id="centerCounter">0</div>
+            <div class="meta">Total pengunjung real-time</div>
           </div>
 
-          <div style="min-width:220px">
-            <label class="small" for="nameInput">Nama Anda</label>
-            <input id="nameInput" type="text" autocomplete="name" placeholder="Masukkan nama..." />
-            <div style="height:10px"></div>
-            <div class="meta">Terakhir kunjungan: <span id="lastVisit">-</span></div>
+          <div style="text-align:right">
+            <div class="meta">Quick Actions</div>
+            <div style="margin-top:8px" class="controls">
+              <button id="simBtn" class="btn">Sim +1</button>
+              <button id="toggleTheme" class="btn ghost">Theme</button>
+            </div>
+            <div style="height:12px"></div>
+            <div class="meta">Greeting</div>
+            <div id="greeting" class="small" style="font-weight:700">Halo —</div>
           </div>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap">
-          <button id="simulateAdd" class="btn">Tambah (Simulasi)</button>
-          <div id="greeting" class="meta">Halo —</div>
+        <div style="height:12px"></div>
+
+        <!-- chart controls -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div style="font-weight:800">Grafik Harian</div>
           <div style="flex:1"></div>
-          <div class="meta small">Suara: <label><input id="soundToggle" type="checkbox" checked /> aktif</label></div>
+          <select id="rangeSelect" class="text-input" style="width:120px;padding:8px;border-radius:8px">
+            <option value="7">7 hari</option>
+            <option value="30">30 hari</option>
+            <option value="90">90 hari</option>
+          </select>
         </div>
-      </section>
 
-      <section class="card chart-card" style="margin-top:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px">
+        <div class="chart-area card" style="height:260px;padding:10px">
+          <canvas id="visitorsChart"></canvas>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <!-- mini game -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div>
-            <strong>Grafik kunjungan</strong>
-            <div class="small">Rentang: <select id="rangeSelect" class="btn" style="padding:6px 8px;">
-              <option value="7">7 hari</option>
-              <option value="30">30 hari</option>
-              <option value="90">90 hari</option>
-            </select></div>
+            <div style="font-weight:800">Mini-Game • Fast Click</div>
+            <div class="small">Klik sebanyak mungkin dalam 5 detik</div>
           </div>
-          <div class="small">Mode chart: bar</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="gameBtn" class="btn">Start</button>
+            <div id="gameScore" class="small" style="background:rgba(255,255,255,0.02);padding:6px 10px;border-radius:8px;font-weight:800;">—</div>
+          </div>
         </div>
-        <canvas id="visitorsChart" height="140" aria-label="Grafik pengunjung"></canvas>
-      </section>
+
+      </main>
+
+      <!-- RIGHT: chat & leaderboard -->
+      <aside class="side-right card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800">Chat Realtime</div>
+          <div class="small">Global</div>
+        </div>
+
+        <div id="messages" class="messages"></div>
+
+        <div class="chat-row">
+          <input id="messageInput" class="text-input" placeholder="Ketik pesan..." />
+          <button id="sendBtn" class="btn">Kirim</button>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-weight:800">Leaderboard</div>
+          <div class="small">Top clicks</div>
+        </div>
+
+        <div id="leaderboard" class="leadboard-list small">Belum ada skor</div>
+
+      </aside>
+
     </div>
-
-    <aside class="side">
-      <div class="card">
-        <h3 style="margin-top:0">Informasi</h3>
-        <div class="small">Pesan: <strong>Jiyy Eazy</strong></div>
-        <div style="height:8px"></div>
-        <div class="small">Theme: <span id="themeLabel">Dark</span></div>
-        <div style="height:8px"></div>
-        <div class="small">Tanggal kunjungan terakhir:</div>
-        <div id="lastVisitBig" style="font-weight:700">-</div>
-      </div>
-
-      <div class="card">
-        <h4 style="margin-top:0">Bagikan</h4>
-        <div class="share" role="navigation" aria-label="share links">
-          <a id="shareTwitter" target="_blank" rel="noopener">Twitter</a>
-          <a id="shareFacebook" target="_blank" rel="noopener">Facebook</a>
-        </div>
-        <div style="height:8px"></div>
-        <div class="small">Penghitungan langsung ke Firebase saat pertama load halaman.</div>
-      </div>
-
-      <div class="card">
-        <h4 style="margin-top:0">Tentang</h4>
-        <div class="small">Data global: Firebase Realtime DB. Preferensi: localStorage (nama, tema, lastVisit).</div>
-      </div>
-    </aside>
 
     <footer>
       <div>Built with ❤️ — Jiyy Eazy</div>
-      <div class="small">Realtime • Data disimpan di Firebase</div>
+      <div class="small">Data real-time tersimpan di Firebase</div>
     </footer>
   </div>
 
-  <!-- ===========================
-       SCRIPT: Firebase & App Logic
-       =========================== -->
+  <!-- ================= FIREBASE (modular v10) & APP LOGIC ================= -->
   <script type="module">
-  /************************************************************************
-   * Jiyy Eazy — Realtime visitor counter (Firebase)
-   * - Uses Firebase Realtime Database (transactions + onValue)
-   * - Updates chart from visits/YYYY-MM-DD
-   * - SessionStorage to avoid double counting per tab/day
-   * - LocalStorage for name/theme/lastVisit
-   * - GSAP animations + Chart.js + WebAudio beep
-   **************************************************************************/
-
-  // ---------- helpers ----------
-  const $ = s => document.querySelector(s);
-  const formatDateTime = d => new Date(d).toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'});
-  const todayKey = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  };
-
-  // ---------- Firebase imports ----------
+  // ---------------- IMPORTS (Firebase modular SDK) ----------------
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
   import {
-    getDatabase, ref, runTransaction, onValue, get, child
+    getDatabase, ref, runTransaction, push, onChildAdded, onValue,
+    set, onDisconnect, get, child
   } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js";
 
-  // ---------- Firebase config (YOU PROVIDED) ----------
+  // ---------------- FIREBASE CONFIG (gunakan config kamu) ------------
   const firebaseConfig = {
     apiKey: "AIzaSyB4r6l8o48oMIdNJQPgAXEGvD_CwbGhNDk",
     authDomain: "jieerealtime.firebaseapp.com",
@@ -182,254 +244,276 @@
     measurementId: "G-HLTHF5PW3F"
   };
 
-  // ---------- init ----------
+  // initialize
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const totalRef = ref(db, 'globalCounter');       // globalCounter -> number
-  const visitsRefRoot = ref(db, 'visits');         // visits/YYYY-MM-DD -> number
-  const lastVisitRef = ref(db, 'lastVisit');       // lastVisit -> ISO string
 
-  // ---------- UI refs ----------
-  const counterDisplay = $('#heroTitle');
-  const lastVisitSm = $('#lastVisit');
-  const lastVisitBig = $('#lastVisitBig');
-  const nameInput = $('#nameInput');
-  const greeting = $('#greeting');
-  const simulateBtn = $('#simulateAdd');
-  const themeToggle = $('#themeToggle');
-  const themeLabel = $('#themeLabel');
-  const resetBtn = $('#resetBtn');
-  const soundToggle = $('#soundToggle');
-  const rangeSelect = $('#rangeSelect');
-  const shareTwitter = $('#shareTwitter');
-  const shareFacebook = $('#shareFacebook');
+  // ---------------- DB refs ----------------
+  const totalRef = ref(db, 'globalCounter');     // number
+  const visitsRef = ref(db, 'visits');           // visits/YYYY-MM-DD
+  const chatRef = ref(db, 'chat');               // push list
+  const presenceRef = ref(db, 'presence');       // presence/{uid}
+  const activityRef = ref(db, 'activity');       // push log
+  const leaderboardRef = ref(db, 'leaderboard'); // push scores
+  const lastVisitRef = ref(db, 'lastVisit');
 
-  // chart holder
-  const ctx = document.getElementById('visitorsChart').getContext('2d');
-  let visitorsChart = null;
+  // ---------------- UI refs ----------------
+  const nameInput = document.getElementById('nameInput');
+  const enterBtn = document.getElementById('enterBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const totalCountEl = document.getElementById('totalCount');
+  const onlineCountEl = document.getElementById('onlineCount');
+  const centerCounter = document.getElementById('centerCounter');
+  const greetingEl = document.getElementById('greeting');
+  const simBtn = document.getElementById('simBtn');
+  const rangeSelect = document.getElementById('rangeSelect');
+  const messagesEl = document.getElementById('messages');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const feedEl = document.getElementById('feed');
+  const localLastEl = document.getElementById('localLast');
+  const visitorsChartCanvas = document.getElementById('visitorsChart').getContext('2d');
+  const gameBtn = document.getElementById('gameBtn');
+  const gameScoreEl = document.getElementById('gameScore');
+  const leaderboardEl = document.getElementById('leaderboard');
+  const shareBtn = document.getElementById('shareBtn');
+  const toggleTheme = document.getElementById('toggleTheme');
 
-  // ---------- state from localStorage ----------
+  // ---------------- Session UID ----------------
+  function getUid(){
+    let id = sessionStorage.getItem('jz_uid');
+    if(!id){ id = 'u_' + Math.random().toString(36).slice(2,10); sessionStorage.setItem('jz_uid', id); }
+    return id;
+  }
+  const uid = getUid();
+
+  // --------------- Local state ---------------
   let state = {
     name: localStorage.getItem('jz_name') || '',
-    theme: localStorage.getItem('jz_theme') || 'dark',
-    lastVisit: localStorage.getItem('jz_lastVisit') || null,
+    theme: localStorage.getItem('jz_theme') || 'dark'
   };
+  if(state.name){ nameInput.value = state.name; greetingEl.textContent = `Halo, ${state.name}!`; }
 
-  // apply theme UI
+  // apply theme
   function applyTheme(t){
-    if(t === 'light'){ document.documentElement.classList.add('light'); themeLabel.textContent = 'Light'; themeToggle.setAttribute('aria-pressed','true'); }
-    else { document.documentElement.classList.remove('light'); themeLabel.textContent = 'Dark'; themeToggle.setAttribute('aria-pressed','false'); }
+    state.theme = t;
+    if(t === 'light') document.documentElement.classList.add('light'); else document.documentElement.classList.remove('light');
+    localStorage.setItem('jz_theme', t);
   }
   applyTheme(state.theme);
 
-  if(state.name){ nameInput.value = state.name; greeting.textContent = `Halo, ${state.name}!`; }
-  if(state.lastVisit){ lastVisitSm.textContent = formatDateTime(state.lastVisit); lastVisitBig.textContent = formatDateTime(state.lastVisit); }
+  toggleTheme.addEventListener('click', ()=> applyTheme(state.theme === 'light' ? 'dark' : 'light'));
 
-  // GSAP entrance
-  gsap.from('.card', {duration:0.9, y:20, opacity:0, stagger:0.06, ease:'power3.out'});
+  // ---------------- Helpers ----------------
+  function todayKey(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+  function pushActivity(text){ push(activityRef, {text, ts: Date.now()}); }
+  function formatLocal(dt){ return new Date(dt).toLocaleString(); }
 
-  // share links
-  function updateShareLinks(){
-    const url = encodeURIComponent(location.href);
-    const text = encodeURIComponent('Jiyy Eazy — cek halaman pengunjung ini!');
-    shareTwitter.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-    shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-  }
-  updateShareLinks();
-
-  // WebAudio beep
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  const audioCtx = AudioContext ? new AudioContext() : null;
-  function playBeep(){
-    if(!audioCtx) return;
+  // ---------------- Presence ----------------
+  async function setPresence(name){
     try{
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type = 'sine'; o.frequency.value = 880;
-      g.gain.value = 0.0001;
-      o.connect(g); g.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-      g.gain.linearRampToValueAtTime(0.12, now + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      o.start(now); o.stop(now + 0.42);
-    }catch(e){ console.warn('audio error', e); }
+      const node = ref(db, `presence/${uid}`);
+      await set(node, {name: name || 'Anon', ts: Date.now()});
+      onDisconnect(node).remove().catch(()=>{});
+    }catch(e){ console.warn('presence err', e); }
   }
 
-  // Animate counter with GSAP
-  function animateCounterTo(n){
-    const from = parseInt(counterDisplay.dataset.current || '0',10);
-    gsap.fromTo(counterDisplay, {innerText: from}, {
-      duration: 0.7,
-      innerText: n,
-      snap: { innerText: 1 },
-      ease: 'power3.out',
-      onUpdate() { counterDisplay.textContent = Math.round(this.targets()[0].innerText); }
-    });
-    counterDisplay.dataset.current = n;
-  }
-
-  // ---------- realtime listeners ----------
-  onValue(totalRef, snap => {
-    const val = snap.val() || 0;
-    animateCounterTo(val);
+  onValue(presenceRef, snap => {
+    const v = snap.val() || {};
+    onlineCountEl.textContent = Object.keys(v).length;
   });
 
-  onValue(lastVisitRef, snap => {
-    const v = snap.val();
-    if(v){
-      lastVisitSm.textContent = formatDateTime(v);
-      lastVisitBig.textContent = formatDateTime(v);
-    }
-  });
-
-  // ---------- increment logic ----------
-  // increment globalCounter and visits/YYYY-MM-DD atomically (two transactions)
-  async function incrementGlobal(amount = 1){
-    // globalCounter
-    try {
-      await runTransaction(totalRef, curr => (curr || 0) + amount);
-    } catch(e){ console.error('inc total failed', e); }
-    // today's visits
-    const key = todayKey();
-    const thisVisitRef = ref(db, `visits/${key}`);
-    try {
-      await runTransaction(thisVisitRef, curr => (curr || 0) + amount);
-    } catch(e){ console.error('inc visit failed', e); }
-    // update lastVisit
-    try {
-      const t = new Date().toISOString();
-      // write lastVisit (not critical to be transactional)
-      await runTransaction(lastVisitRef, _ => t);
-      // store local lastVisit too
-      localStorage.setItem('jz_lastVisit', t);
-      lastVisitSm.textContent = formatDateTime(t);
-      lastVisitBig.textContent = formatDateTime(t);
-    } catch(e){ /* ignore */ }
+  // ---------------- Visitor counter ----------------
+  async function incrementVisitor(amount = 1){
+    try{
+      await runTransaction(totalRef, cur => (cur || 0) + amount);
+      // increment today's visits
+      const key = todayKey();
+      const dayRef = ref(db, `visits/${key}`);
+      await runTransaction(dayRef, cur => (cur || 0) + amount);
+      await set(lastVisitRef, new Date().toISOString());
+      pushActivity(`${state.name || 'Anon'} visited (+${amount})`);
+    }catch(e){ console.error('inc err', e); }
   }
 
-  // Auto increment once per tab/day using sessionStorage (prevent reload spam)
-  (async function autoCountOncePerDay(){
-    try {
-      const flagKey = 'jz_counted:' + todayKey();
-      if(!sessionStorage.getItem(flagKey)){
-        await incrementGlobal(1);
-        sessionStorage.setItem(flagKey, '1');
-        if(soundToggle.checked) playBeep();
-      }
-    } catch(err){
-      console.error('auto increment error', err);
+  // auto increment once per tab/day
+  (function autoCount(){
+    const flag = 'jz_counted:' + todayKey();
+    if(!sessionStorage.getItem(flag)){
+      incrementVisitor(1).then(()=> sessionStorage.setItem(flag, '1'));
     }
   })();
 
-  // Manual simulate button
-  simulateBtn.addEventListener('click', async () => {
-    await incrementGlobal(1);
-    if(soundToggle.checked) playBeep();
+  // listen global counter
+  onValue(totalRef, snap => {
+    const v = snap.val() || 0;
+    totalCountEl.textContent = v;
+    gsap.to(centerCounter, {duration:0.6, innerText: v, snap:{innerText:1}, onUpdate(){ centerCounter.textContent = Math.round(this.targets()[0].innerText); }});
   });
 
-  // ---------- Chart: build from visits keys ----------
-  async function getVisitsArray(days){
-    const labels = [], counts = [];
+  // listen last visit node
+  onValue(lastVisitRef, snap => {
+    const v = snap.val(); if(v) localLastEl.textContent = formatLocal(v);
+  });
+
+  // ---------------- Chat (realtime) ----------------
+  // use onChildAdded so messages append on arrival
+  onChildAdded(chatRef, (snap) => {
+    const m = snap.val();
+    if(!m) return;
+    const el = document.createElement('div');
+    el.className = 'msg ' + ((m.name === state.name) ? 'me' : 'other');
+    el.innerHTML = `<div style="font-weight:700">${escapeHtml(m.name||'Anon')}</div><div style="margin-top:6px">${escapeHtml(m.text)}</div><div style="font-size:11px;color:var(--muted);margin-top:6px">${new Date(m.ts).toLocaleTimeString()}</div>`;
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+
+  // send message
+  sendBtn.addEventListener('click', async ()=>{
+    const t = (messageInput.value || '').trim(); if(!t) return;
+    await push(chatRef, {name: state.name || 'Anon', text: t, ts: Date.now()});
+    pushActivity(`${state.name || 'Anon'}: ${t}`);
+    messageInput.value = '';
+  });
+  messageInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') sendBtn.click(); });
+
+  // ---------------- Activity feed ----------------
+  onValue(activityRef, snap => {
+    const v = snap.val() || {};
+    const arr = Object.keys(v).map(k => v[k]).sort((a,b)=>b.ts - a.ts).slice(0,40);
+    feedEl.innerHTML = arr.map(it => `<div style="padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)"><div style="font-size:13px">${escapeHtml(it.text)}</div><div style="font-size:11px;color:var(--muted)">${new Date(it.ts).toLocaleString()}</div></div>`).join('');
+  });
+
+  // ---------------- Chart (visits) ----------------
+  async function getVisits(days){
+    const labels = [], data = [];
     const now = new Date();
     for(let i=days-1;i>=0;i--){
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i);
       const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      labels.push(d.toLocaleDateString('id-ID', {month:'short', day:'numeric'}));
-      try {
-        const snap = await get(child(visitsRefRoot, key));
-        counts.push(snap.exists() ? snap.val() : 0);
-      } catch(e) {
-        counts.push(0);
-      }
+      labels.push(d.toLocaleDateString('id-ID',{month:'short', day:'numeric'}));
+      try{
+        const snap = await get(child(ref(db), `visits/${key}`));
+        data.push(snap.exists() ? snap.val() : 0);
+      }catch(e){ data.push(0); }
     }
-    return {labels, counts};
+    return {labels, data};
   }
 
+  let visitsChart = null;
   async function renderChart(days = parseInt(rangeSelect.value || '7')){
-    const {labels, counts} = await getVisitsArray(days);
-    if(visitorsChart) visitorsChart.destroy();
-    visitorsChart = new Chart(ctx, {
+    const {labels, data} = await getVisits(days);
+    if(visitsChart) visitsChart.destroy();
+    visitsChart = new Chart(visitorsChartCanvas, {
       type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Pengunjung per hari',
-          data: counts,
-          backgroundColor: counts.map(()=> 'rgba(124,58,237,0.9)'),
-          borderRadius: 6
-        }]
-      },
+      data: { labels, datasets: [{ data, backgroundColor: data.map(()=> 'rgba(139,92,246,0.9)'), borderRadius:6 }] },
       options: {
-        responsive:true,
-        maintainAspectRatio:false,
-        scales:{ x:{ grid:{ display:false } }, y:{ beginAtZero:true, ticks:{ precision:0 } } },
-        plugins:{ legend:{ display:false } }
+        plugins: { legend: { display:false } },
+        scales: { x: { grid: { display:false } }, y: { grid: { display:false }, beginAtZero:true } },
+        maintainAspectRatio:false, responsive:true
       }
     });
   }
+  renderChart(7);
+  rangeSelect.addEventListener('change', ()=> renderChart(parseInt(rangeSelect.value)));
+  // update chart when visits change
+  onValue(visitsRef, ()=> { if(window._cdeb) clearTimeout(window._cdeb); window._cdeb = setTimeout(()=> renderChart(parseInt(rangeSelect.value)), 450); });
 
-  rangeSelect.addEventListener('change', () => renderChart(parseInt(rangeSelect.value)));
-  // initial render
-  renderChart(parseInt(rangeSelect.value));
+  // ---------------- Leaderboard ----------------
+  async function loadLeaderboard(){
+    const snap = await get(leaderboardRef);
+    const v = snap.val() || {};
+    const arr = Object.keys(v).map(k => v[k]).sort((a,b)=>b.score - a.score).slice(0,8);
+    leaderboardEl.innerHTML = arr.map(it => `${escapeHtml(it.name)} — ${it.score}`).join('<br>') || '<div class="small">Belum ada skor</div>';
+  }
+  onValue(leaderboardRef, ()=> loadLeaderboard());
+  loadLeaderboard();
 
-  // Re-render chart realtime when visits node changes
-  onValue(visitsRefRoot, () => {
-    if(window._jz_chart_timeout) clearTimeout(window._jz_chart_timeout);
-    window._jz_chart_timeout = setTimeout(()=> renderChart(parseInt(rangeSelect.value)), 450);
+  // ---------------- Mini Game (Fast Click: count clicks in 5s) ----------------
+  let gameActive = false;
+  gameBtn.addEventListener('click', ()=>{
+    if(gameActive) return;
+    gameActive = true;
+    let clicks = 0;
+    gameScoreEl.textContent = '0';
+    gameBtn.textContent = 'Go!';
+    function clickHandler(){ clicks++; gameScoreEl.textContent = clicks; }
+    document.addEventListener('click', clickHandler);
+    setTimeout(async ()=>{
+      document.removeEventListener('click', clickHandler);
+      gameActive = false;
+      gameBtn.textContent = 'Start';
+      // push score
+      await push(leaderboardRef, {name: state.name || 'Anon', score: clicks, ts: Date.now()});
+      pushActivity(`${state.name || 'Anon'} scored ${clicks}`);
+      loadLeaderboard();
+    }, 5000);
   });
 
-  // ---------- local storage interactions ----------
-  nameInput.addEventListener('input', (e)=>{
-    const v = e.target.value.trim();
-    state.name = v;
-    localStorage.setItem('jz_name', v);
-    greeting.textContent = v ? `Halo, ${v}!` : 'Halo —';
+  // ---------------- Enter / Logout / Simulate ----------------
+  enterBtn.addEventListener('click', async ()=>{
+    const n = (nameInput.value || '').trim();
+    if(!n) return alert('Nama tidak boleh kosong');
+    state.name = n;
+    localStorage.setItem('jz_name', n);
+    greetingEl.textContent = `Halo, ${n}!`;
+    // set presence & mark online
+    await setPresence(n);
+    pushActivity(`${n} masuk`);
   });
 
-  themeToggle.addEventListener('click', ()=>{
-    state.theme = (state.theme === 'light') ? 'dark' : 'light';
-    localStorage.setItem('jz_theme', state.theme);
-    applyTheme(state.theme);
+  logoutBtn.addEventListener('click', ()=>{
+    const prev = state.name;
+    state.name = '';
+    localStorage.removeItem('jz_name');
+    nameInput.value = '';
+    greetingEl.textContent = 'Halo —';
+    set(ref(db, `presence/${uid}`), null).catch(()=>{});
+    pushActivity(`${prev || 'Anon'} keluar`);
   });
 
-  // sound pref
-  soundToggle.addEventListener('change', ()=> localStorage.setItem('jz_sound', soundToggle.checked ? '1' : '0'));
-  (function loadSoundPref(){ const s = localStorage.getItem('jz_sound'); if(s === '0') soundToggle.checked = false; })();
+  simBtn.addEventListener('click', ()=> incrementVisitor(1));
 
-  // last visit persisted on unload
-  window.addEventListener('beforeunload', ()=>{
-    const nowISO = new Date().toISOString();
-    localStorage.setItem('jz_lastVisit', nowISO);
+  // ---------------- Presence update to UI list (optional) ----------------
+  onValue(presenceRef, snap => {
+    const v = snap.val() || {};
+    // we won't spam activity on each presence change
   });
-  // set initial local lastVisit
-  (function setInitialLastVisit(){
-    const prev = localStorage.getItem('jz_lastVisit');
-    if(prev){ lastVisitSm.textContent = formatDateTime(prev); lastVisitBig.textContent = formatDateTime(prev); }
-    const nowISO = new Date().toISOString();
-    localStorage.setItem('jz_lastVisit', nowISO);
+
+  // ---------------- Share ----------------
+  shareBtn.addEventListener('click', ()=> {
+    const url = encodeURIComponent(location.href);
+    const text = encodeURIComponent('Cek Jiyy Eazy realtime dashboard!');
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  });
+
+  // ---------------- Utils & startup ----------------
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  (async function init(){
+    // initial last local
+    const now = new Date().toISOString();
+    localStorage.setItem('jz_last', now);
+    localLastEl.textContent = new Date(now).toLocaleString();
+
+    // auto presence if name saved
+    const saved = localStorage.getItem('jz_name');
+    if(saved){
+      state.name = saved;
+      nameInput.value = saved;
+      greetingEl.textContent = `Halo, ${saved}!`;
+      await setPresence(saved);
+      pushActivity(`${saved} kembali`);
+    }
+    // initial total fetch
+    try{
+      const snap = await get(totalRef);
+      if(snap.exists()) totalCountEl.textContent = snap.val();
+    }catch(e){ console.warn(e); }
+
+    gsap.from('.card', {y:20, opacity:0, duration:0.9, stagger:0.06});
   })();
 
-  // reset local storage (not firebase)
-  resetBtn.addEventListener('click', ()=>{
-    if(confirm('Reset data lokal (nama, tema, lastVisit)?')) {
-      localStorage.removeItem('jz_name'); localStorage.removeItem('jz_theme'); localStorage.removeItem('jz_lastVisit'); localStorage.removeItem('jz_sound');
-      state.name = ''; state.theme = 'dark';
-      nameInput.value = ''; greeting.textContent = 'Halo —'; applyTheme('dark');
-      alert('Local data di-reset. Data global di Firebase tetap aman.');
-    }
-  });
-
-  // handle storage changes multi-tab
-  window.addEventListener('storage', (e)=>{
-    if(e.key === 'jz_name'){ nameInput.value = localStorage.getItem('jz_name') || ''; greeting.textContent = nameInput.value ? `Halo, ${nameInput.value}!` : 'Halo —'; }
-    if(e.key === 'jz_theme'){ applyTheme(localStorage.getItem('jz_theme') || 'dark'); }
-    if(e.key === 'jz_lastVisit'){ lastVisitSm.textContent = formatDateTime(localStorage.getItem('jz_lastVisit')); lastVisitBig.textContent = formatDateTime(localStorage.getItem('jz_lastVisit')); }
-  });
-
-  // accessibility: Enter on simulate button
-  simulateBtn.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') { simulateBtn.click(); e.preventDefault(); } });
-
-  // Done
   </script>
 </body>
 </html>
