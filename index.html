@@ -1,662 +1,775 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jiyy Eazy — Game Hub (10 Mini Games)</title>
-  <meta name="description" content="10 mini games ringan — Jiyy Eazy Game Hub. Semua client-side, responsive, dan teks tidak bisa diseleksi."/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* GLOBAL: disable text selection & image drag */
-    * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select:none; user-select:none; }
-    img, .no-drag { -webkit-user-drag: none; user-drag: none; }
-    /* basic focus outline for accessibility */
-    :focus { outline: 3px solid rgba(59,130,246,0.25); outline-offset: 2px; }
-    /* watermark */
-    #aji17mark { position: fixed; bottom: 12px; right: 12px; z-index: 9999; color: rgba(220,38,38,0.4); font-weight:700; pointer-events:none; }
-    /* small cards */
-    .card { -webkit-tap-highlight-color: transparent; }
-    /* ensure buttons are readable */
-    button { cursor: pointer; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ruang Game — Portal</title>
+
+<!-- Tailwind v3 via CDN + custom config -->
+<script>
+  // Tailwind CDN config: custom colors, fonts
+  tailwindConfig = {
+    theme: {
+      extend: {
+        colors: {
+          'neon-blue': '#6EE7FF',
+          'neon-purple': '#A78BFA',
+          'space-black': '#030317',
+          'glass-100': 'rgba(255,255,255,0.04)'
+        },
+        fontFamily: {
+          sans: ['Poppins','Inter','ui-sans-serif','system-ui','-apple-system']
+        },
+        boxShadow: {
+          'glow-sm': '0 6px 20px rgba(107,99,255,0.14), 0 0 14px rgba(99,102,241,0.12)'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Make the page PWA-friendly (manifest will be injected via blob at runtime) -->
+<meta name="theme-color" content="#0b1020">
+
+<style>
+/* GLOBAL: prevent text selection anywhere */
+* { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+/* base layout */
+:root{
+  --bg-1: linear-gradient(180deg,#020617 0%, #071026 60%, #0b0520 100%);
+  --accent: #6EE7FF;
+  --accent-2: #A78BFA;
+  --glass: rgba(255,255,255,0.03);
+}
+
+/* full page layout */
+html,body,#app{height:100%}
+body{
+  margin:0;
+  font-family:Inter, Poppins, system-ui, -apple-system;
+  background: var(--bg-1);
+  color: #E6EEF3;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  scroll-behavior: smooth;
+}
+
+/* hide scrollbar but keep scrollability */
+::-webkit-scrollbar{height:8px;width:8px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:999px}
+
+/* header */
+.header-glow{
+  backdrop-filter: blur(8px) saturate(130%);
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+/* hero slider */
+.hero-slide{
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+/* small floating animation */
+@keyframes floaty {
+  0% { transform: translateY(0px) }
+  50% { transform: translateY(-10px) }
+  100% { transform: translateY(0px) }
+}
+.floaty { animation: floaty 6s ease-in-out infinite; }
+
+/* glow button */
+.glow-btn{
+  box-shadow: 0 6px 24px rgba(110,231,255,0.08), 0 0 28px rgba(167,139,250,0.06);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.glow-btn:active{ transform: translateY(1px) scale(.99) }
+
+/* game card hover */
+.game-card:hover{ transform: translateY(-8px) scale(1.02); box-shadow: 0 18px 40px rgba(2,6,23,0.6) }
+
+/* modal */
+.modal-backdrop{
+  background: linear-gradient(180deg, rgba(2,4,12,0.6), rgba(2,4,12,0.85));
+  backdrop-filter: blur(8px);
+}
+
+/* profile protection overlay */
+.profile-protect{
+  position: absolute;
+  inset:0;
+  z-index:5;
+}
+
+/* make clickable items obvious on focus for keyboard */
+:focus { outline: 2px solid rgba(110,231,255,0.08); outline-offset: 2px; }
+
+/* responsive tweaks */
+@media (max-width:640px){
+  .desktop-only{ display:none }
+}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased">
+<body class="antialiased">
 
-  <!-- watermark -->
-  <div id="aji17mark">AJI17</div>
+<div id="app" class="min-h-screen flex flex-col">
 
-  <!-- header -->
-  <header class="bg-white shadow sticky top-0 z-40">
+  <!-- CANVAS BACKGROUND (animated particles/parallax) -->
+  <canvas id="bgCanvas" class="fixed inset-0 -z-10"></canvas>
+
+  <!-- LOADING overlay -->
+  <div id="loading" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4">
+      <div class="w-24 h-24 rounded-full border-4 border-t-transparent border-neon-purple animate-spin"></div>
+      <div class="text-sm text-slate-200/80">Mempersiapkan Ruang Game...</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header-glow sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold">J</div>
-        <div>
-          <div class="font-bold">Jiyy Eazy</div>
-          <div class="text-xs text-slate-500">Game Hub — 10 Mini Games</div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 cursor-pointer select-none" id="brand">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-neon-blue to-neon-purple flex items-center justify-center shadow-glow-sm">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="text-black"><path d="M4 12h16" stroke="#030317" stroke-width="1.6" stroke-linecap="round"/><path d="M12 4v16" stroke="#030317" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="text-white font-semibold text-lg leading-4">Ruang Game</div>
+            <div class="text-xs text-slate-300/60 -mt-0.5">Portal & Game Hub</div>
+          </div>
         </div>
+        <nav class="hidden sm:flex items-center gap-3 text-sm text-slate-300 ml-6">
+          <a class="hover:text-white transition" href="#home">Home</a>
+          <a class="hover:text-white transition" href="#games">Game List</a>
+          <a class="hover:text-white transition" href="#new">Terbaru</a>
+          <a class="hover:text-white transition" href="#profile">Profil</a>
+          <a id="logoutBtn" class="hover:text-white transition cursor-pointer">Keluar</a>
+        </nav>
       </div>
 
-      <nav class="flex items-center gap-3">
-        <a href="#home" class="text-sm text-slate-600 hover:text-emerald-600">Home</a>
-        <a href="#games" class="text-sm text-slate-600 hover:text-emerald-600">Games</a>
-        <a href="#contact" class="text-sm text-slate-600 hover:text-emerald-600">Contact</a>
-      </nav>
+      <div class="flex items-center gap-3">
+        <!-- notification -->
+        <button id="notifBtn" class="relative p-2 rounded-md glow-btn" title="Notifikasi">
+          <span class="w-3 h-3 bg-red-500 rounded-full absolute -top-1 -right-1 animate-pulse"></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118.6 14.6V11c0-2.761-1.79-5-4-5S10 8.239 10 11v3.6c0 .538-.214 1.055-.595 1.445L8 17h7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <!-- profile tiny -->
+        <div id="profileWrap" class="relative">
+          <!-- profile in Shadow DOM for extra friction for anyone trying to inspect quick -->
+          <profile-widget></profile-widget>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Main -->
+  <main class="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <!-- HERO -->
+    <section id="home" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div class="lg:col-span-2 p-6 rounded-2xl glass-100" style="background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03)">
+        <div class="flex flex-col md:flex-row justify-between gap-6">
+          <div class="flex-1">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white/96 tracking-tight">Temukan Game Favoritmu</h1>
+            <p class="mt-2 text-slate-300/70">Portal interaktif untuk main cepat, cek rating, dan simpan favorit. Mode gelap otomatis dan pengalaman mobile-first.</p>
 
-    <!-- hero -->
-    <section id="home" class="mb-8">
-      <div class="bg-gradient-to-r from-emerald-400 to-blue-500 text-white p-6 rounded-lg flex flex-col md:flex-row items-center gap-6">
-        <div class="flex-1">
-          <h1 class="text-2xl md:text-3xl font-extrabold">Jiyy Eazy — Mini Game Hub</h1>
-          <p class="mt-2 text-sm md:text-base text-white/90">10 game ringan untuk hiburan dan demo kemampuan JavaScript. Semua client-side. Tekan tab "Games" dan pilih permainan.</p>
-          <div class="mt-4 flex gap-2">
-            <a href="#games" class="bg-white text-slate-800 px-4 py-2 rounded shadow text-sm">MULAI MAIN</a>
-            <a href="#contact" class="border border-white/40 px-4 py-2 rounded text-sm">KONTAK</a>
+            <div class="mt-6 flex flex-wrap gap-3 items-center">
+              <button id="playNow" class="px-5 py-3 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple text-black font-semibold glow-btn">Main Sekarang</button>
+              <button id="exploreBtn" class="px-4 py-3 rounded-full border border-slate-600 text-slate-200">Jelajahi Semua</button>
+            </div>
+          </div>
+
+          <!-- slider -->
+          <div class="w-full md:w-96 h-56 md:h-48 relative overflow-hidden rounded-xl hero-slide" id="heroSlider" aria-hidden="false">
+            <!-- slides injected by JS -->
           </div>
         </div>
 
-        <div class="w-36 h-36 rounded-full bg-white/30 flex items-center justify-center">
-          <div class="w-28 h-28 rounded-full bg-cover bg-center" style="background-image:url('https://files.catbox.moe/byftzo.jpg')"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- games navigation -->
-    <section id="games" class="mb-6">
-      <h2 class="text-xl font-semibold mb-3">Daftar Game (10)</h2>
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <!-- list of games -->
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="1">1. Tebak Angka</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="2">2. Batu-Gunting-Kertas</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="3">3. Memory Pair</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="4">4. Reaction Time</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="5">5. Trivia (MCQ)</button>
-
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="6">6. Color Match</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="7">7. Whack-a-Box</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="8">8. Emoji Recall</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="9">9. Hitung Bentuk</button>
-        <button class="card p-3 bg-white rounded-lg border hover:shadow" data-game="10">10. Typing Sprint</button>
-      </div>
-    </section>
-
-    <!-- game stage -->
-    <section id="stage" class="mb-8">
-      <div class="bg-white rounded-lg p-6 shadow">
-        <div id="gameTitle" class="text-lg font-semibold mb-4">Pilih game untuk mulai</div>
-        <div id="gameArea">
-          <p class="text-sm text-slate-600">Klik salah satu tombol game di atas untuk memulai. Semua game bekerja offline dan di client.</p>
+        <!-- small quick filters -->
+        <div class="mt-6 flex gap-2 flex-wrap">
+          <div class="text-sm text-slate-300/70">Filter:</div>
+          <select id="genreFilter" class="bg-transparent border border-slate-700 rounded px-3 py-2 text-sm">
+            <option value="all">Semua Genre</option>
+          </select>
+          <select id="ratingFilter" class="bg-transparent border border-slate-700 rounded px-3 py-2 text-sm">
+            <option value="all">Semua Rating</option>
+            <option value="4">Rating ≥ 4</option>
+            <option value="3">Rating ≥ 3</option>
+          </select>
         </div>
 
-        <div class="mt-4">
-          <button id="resetGame" class="px-3 py-2 bg-emerald-500 text-white rounded hidden">Reset Game</button>
+      </div>
+
+      <!-- RIGHT: small cards -->
+      <aside class="space-y-4">
+        <div class="p-4 rounded-2xl" style="background:linear-gradient(180deg,#071129, #030317); border:1px solid rgba(255,255,255,0.02)">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-slate-300 text-sm">Saldo</div>
+              <div class="text-white font-semibold text-xl">1500 XP</div>
+            </div>
+            <button id="topupBtn" class="px-3 py-2 rounded-md bg-neon-blue text-black font-semibold">Top Up</button>
+          </div>
+          <div class="mt-4 text-slate-400 text-sm">Tantangan: Main 3 hari berturut-turut untuk bonus</div>
         </div>
+
+        <div class="p-4 rounded-2xl modal-trigger cursor-pointer" data-game-id="g3" style="background:linear-gradient(180deg,#021024,#021019); border:1px solid rgba(255,255,255,0.02)">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-neon-purple to-neon-blue flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="#030317" stroke-width="1.6"/></svg>
+            </div>
+            <div>
+              <div class="text-white font-medium">Event Mingguan</div>
+              <div class="text-slate-300 text-xs">Menangkan skin eksklusif</div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </section>
+
+    <!-- GAME LIST -->
+    <section id="games">
+      <h2 class="text-xl font-semibold mb-4">Game List</h2>
+      <div id="gameGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- game cards injected by JS / custom element -->
       </div>
     </section>
 
-    <!-- small tips -->
-    <section class="mb-8">
-      <div class="bg-white p-4 rounded-lg border text-sm text-slate-600">
-        <strong>Catatan:</strong> teks tidak bisa diseleksi atau disalin (sesuai permintaan). Jika ada bug, refresh halaman untuk reset semua game.
+    <!-- LATEST / TERBARU -->
+    <section id="new">
+      <h2 class="text-xl font-semibold mb-4">Terbaru</h2>
+      <div id="latestList" class="space-y-3">
+        <!-- small items -->
       </div>
     </section>
 
-    <!-- contact -->
-    <section id="contact" class="mb-8">
-      <div class="bg-emerald-50 p-6 rounded-lg">
-        <h3 class="font-semibold">Kontak</h3>
-        <p class="text-sm text-slate-600">Email: <span class="font-mono">hi@jiyy-eazy.example</span></p>
+    <!-- PROFILE -->
+    <section id="profile" class="rounded-2xl p-6" style="background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03)">
+      <h2 class="text-xl font-semibold mb-4">Profil Saya</h2>
+      <div class="flex flex-col sm:flex-row gap-6">
+        <div class="relative w-40 h-40 rounded-xl overflow-hidden">
+          <!-- Protected profile image rendered in Shadow DOM -> extra friction -->
+          <div id="profileShadowMount"></div>
+          <!-- overlay to block download / selection -->
+          <div class="profile-protect" aria-hidden="true"></div>
+        </div>
+
+        <div class="flex-1">
+          <div class="text-white text-lg font-semibold" id="username">Guest Player</div>
+          <div class="text-slate-300 mt-1" id="userbio">Selamat datang di Ruang Game — simpan favoritmu dan jelajahi ratusan game.</div>
+
+          <div class="mt-4 flex gap-2">
+            <button id="editProfile" class="px-4 py-2 rounded-md glow-btn bg-neon-purple text-black">Edit Profil</button>
+            <button id="saveFavs" class="px-4 py-2 rounded-md border border-slate-600">Simpan Favorit</button>
+          </div>
+        </div>
       </div>
     </section>
 
   </main>
 
-  <!-- footer -->
-  <footer class="text-center py-6 text-slate-500 text-sm">© <span id="yr"></span> Jiyy Eazy • All Rights Reserved</footer>
+  <!-- Footer -->
+  <footer class="bg-transparent border-t border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-sm text-slate-400">&copy; <span id="year"></span> Ruang Game. Semua hak cipta dilindungi.</div>
+      <div class="flex items-center gap-4">
+        <a class="text-slate-300 hover:text-white" href="#" aria-label="Twitter">Twitter</a>
+        <a class="text-slate-300 hover:text-white" href="#" aria-label="Instagram">Instagram</a>
+        <a class="text-slate-300 hover:text-white" href="#" aria-label="Privacy">Kebijakan Privasi</a>
+      </div>
+    </div>
+  </footer>
+</div>
 
-  <!-- scripts -->
-  <script>
-  document.getElementById('yr').textContent = new Date().getFullYear();
+<!-- Modal template for game detail (custom element) -->
+<template id="game-modal-template">
+  <style>
+    :host { all: initial; font-family: Inter, Poppins, sans-serif; }
+    .back { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:60}
+    .card { width:clamp(320px,75vw,880px); border-radius:14px; padding:18px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:#EAF6FF; box-shadow:0 10px 40px rgba(2,6,23,0.6) }
+    .close { position:absolute; right:16px; top:14px; cursor:pointer }
+  </style>
+  <div class="back modal-backdrop">
+    <div class="card">
+      <div class="close" id="closeBtn">✕</div>
+      <div id="content"></div>
+    </div>
+  </div>
+</template>
 
-  // prevent context menu
-  window.addEventListener('contextmenu', e => e.preventDefault());
+<script>
+/* =========== Sample game data (would normally fetch remote) ============ */
+const GAMES = [
+  { id:'g1', title:'Nebula Runner', genre:'Arcade', rating:4.7, img:'https://picsum.photos/seed/nebula/800/450', desc:'Lari di antara galaksi dan kumpulkan aurora.' },
+  { id:'g2', title:'Cyber Drift', genre:'Racing', rating:4.4, img:'https://picsum.photos/seed/cyber/800/450', desc:'Balapan neon dengan mobil futuristik.' },
+  { id:'g3', title:'Dungeon Echoes', genre:'RPG', rating:4.1, img:'https://picsum.photos/seed/dungeon/800/450', desc:'Jelajahi ruang bawah tanah penuh teka-teki.' },
+  { id:'g4', title:'Pixel Garden', genre:'Casual', rating:3.9, img:'https://picsum.photos/seed/pixel/800/450', desc:'Tanam, rawat, dan kembangkan kebun pixel.' },
+  { id:'g5', title:'Astro Siege', genre:'Strategy', rating:4.6, img:'https://picsum.photos/seed/astro/800/450', desc:'Pertahankan pangkalan dari gelombang asing.' },
+  { id:'g6', title:'Echo Fighters', genre:'Fighting', rating:4.0, img:'https://picsum.photos/seed/echo/800/450', desc:'Tinju, bertarung, dan naik level skillmu.' }
+];
 
-  // utilities
-  const byId = id => document.getElementById(id);
-  const gameArea = document.getElementById('gameArea');
-  const gameTitle = document.getElementById('gameTitle');
-  const resetBtn = document.getElementById('resetGame');
+/* =========== Helper: small notification system ============ */
+function notify(msg, type='info') {
+  const n = document.createElement('div');
+  n.className = 'fixed right-6 bottom-6 z-60 p-3 rounded-md shadow-glow-sm';
+  n.style.background = type === 'error' ? 'linear-gradient(90deg,#ff6b6b,#ff4757)' : 'linear-gradient(90deg,#6EE7FF,#A78BFA)';
+  n.innerHTML = `<div class="text-sm font-medium">${msg}</div>`;
+  document.body.appendChild(n);
+  setTimeout(()=> n.style.opacity = '0', 2800);
+  setTimeout(()=> n.remove(), 3500);
+}
 
-  // switcher
-  document.querySelectorAll('[data-game]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = Number(btn.getAttribute('data-game'));
-      startGame(id);
+/* =========== Create hero slider slides ============ */
+function renderHero() {
+  const hero = document.getElementById('heroSlider');
+  hero.innerHTML = '';
+  GAMES.slice(0,3).forEach((g,i)=>{
+    const s = document.createElement('div');
+    s.className = 'absolute inset-0 transition-all duration-700 rounded-xl overflow-hidden';
+    s.style.backgroundImage = `url(${g.img})`;
+    s.style.backgroundSize = 'cover';
+    s.style.backgroundPosition = 'center';
+    s.style.transform = `translateX(${i*100}%)`;
+    s.style.zIndex = 20 - i;
+    s.innerHTML = `
+      <div style="backdrop-filter: blur(6px)" class="h-full w-full p-5 flex flex-col justify-end">
+        <div class="bg-gradient-to-t from-black/60 to-transparent p-4 rounded-lg">
+          <div class="text-white font-semibold text-lg">${g.title}</div>
+          <div class="text-xs text-slate-300">${g.genre} · Rating ${g.rating}</div>
+        </div>
+      </div>`;
+    hero.appendChild(s);
+  });
+
+  // simple auto slide with parallax on mouse move
+  let idx = 0;
+  setInterval(()=>{
+    idx = (idx+1)%3;
+    [...hero.children].forEach((el,i)=>{
+      el.style.transform = `translateX(${(i-idx)*100}%)`;
     });
-  });
+  },4200);
+}
 
-  // store active game id and state
-  let activeGame = null;
-  let gameState = {};
-
-  // Reset handler
-  resetBtn.addEventListener('click', () => {
-    if (activeGame) startGame(activeGame, true);
-  });
-
-  // Helpers for DOM creation
-  function el(tag, attrs={}, children=[]) {
-    const e = document.createElement(tag);
-    for (const k in attrs) {
-      if (k === 'class') e.className = attrs[k];
-      else if (k === 'text') e.textContent = attrs[k];
-      else if (k === 'html') e.innerHTML = attrs[k];
-      else e.setAttribute(k, attrs[k]);
-    }
-    if (!Array.isArray(children)) children = [children];
-    children.forEach(c => { if (typeof c === 'string') e.appendChild(document.createTextNode(c)); else if (c) e.appendChild(c); });
-    return e;
+/* =========== Game card custom element using Shadow DOM ============ */
+class GameCard extends HTMLElement {
+  constructor(){
+    super();
+    this.attachShadow({mode:'open'});
   }
+  connectedCallback(){
+    const data = JSON.parse(this.getAttribute('data'));
+    const wrapper = document.createElement('div');
+    wrapper.className = 'game-card group rounded-xl overflow-hidden transition transform bg-gradient-to-b from-[#081026] to-[#020317] border border-slate-700 p-0';
+    wrapper.style.cursor = 'pointer';
+    wrapper.innerHTML = `
+      <style>
+        :host{display:block}
+        .card{padding:0}
+        .thumb{height:180px;background-size:cover;background-position:center;transition:transform .35s ease}
+        .meta{padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+        .hoverable{transition: transform .18s ease, box-shadow .18s ease}
+      </style>
+      <div class="card hoverable">
+        <div class="thumb" role="img" aria-label="${data.title}" style="background-image:url('${data.img}?auto=compress&dpr=1');"></div>
+        <div class="meta">
+          <div class="flex items-center justify-between">
+            <div><div class="text-white font-semibold">${data.title}</div><div class="text-xs text-slate-300 mt-1">${data.genre}</div></div>
+            <div class="text-sm text-slate-200 font-semibold">${data.rating.toFixed(1)}</div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button class="btnExplore px-3 py-1 rounded-md text-sm ring-1 ring-slate-700">Jelajahi</button>
+            <button class="btnFav px-3 py-1 rounded-md text-sm ring-1 ring-slate-700">❤</button>
+          </div>
+        </div>
+      </div>
+    `;
+    this.shadowRoot.appendChild(wrapper);
 
-  /* ===========================
-     Game 1 - Tebak Angka
-     =========================== */
-  function game1(container, reset=false) {
-    gameTitle.textContent = '1. Tebak Angka (1 - 100)';
-    if (reset || !gameState.g1) {
-      gameState.g1 = { target: Math.floor(Math.random()*100)+1, attempts:0 };
-    }
-    const state = gameState.g1;
-    container.innerHTML = '';
-    const info = el('div',{class:'mb-3 text-slate-600'},`Saya sudah memilih angka antara 1 - 100. Tebak!`);
-    const input = el('input',{class:'border px-3 py-2 rounded w-48','type':'number','placeholder':'Masukkan angka'});
-    const btn = el('button',{class:'ml-2 px-3 py-2 bg-emerald-500 text-white rounded'},'Tebak');
-    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+    // interactions
+    wrapper.querySelector('.btnExplore').addEventListener('click', (e)=> {
+      e.stopPropagation();
+      window.dispatchEvent(new CustomEvent('open-game-modal',{detail:data}));
+    });
+    wrapper.querySelector('.btnFav').addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const favs = JSON.parse(localStorage.getItem('rg_favs')||'[]');
+      if(!favs.includes(data.id)) { favs.push(data.id); localStorage.setItem('rg_favs', JSON.stringify(favs)); notify('Ditambahkan ke favorit!'); }
+      else { notify('Sudah ada di favorit.'); }
+    });
+    this.shadowRoot.querySelector('.thumb').addEventListener('click', ()=> {
+      window.dispatchEvent(new CustomEvent('open-game-modal',{detail:data}));
+    });
 
-    btn.addEventListener('click', ()=>{
-      const v = Number(input.value);
-      if (!v) { out.textContent = 'Masukkan angka valid.'; return; }
-      state.attempts++;
-      if (v === state.target) {
-        out.textContent = `Benar! Angka ${v}. Jumlah percobaan: ${state.attempts}.`;
-        out.className = 'mt-3 text-sm text-emerald-600';
-      } else if (v < state.target) {
-        out.textContent = 'Terlalu kecil.';
-      } else {
-        out.textContent = 'Terlalu besar.';
+    // hover effect
+    wrapper.addEventListener('mouseenter', ()=> this.shadowRoot.querySelector('.thumb').style.transform = 'scale(1.06)');
+    wrapper.addEventListener('mouseleave', ()=> this.shadowRoot.querySelector('.thumb').style.transform = 'scale(1)');
+  }
+}
+customElements.define('game-card', GameCard);
+
+/* =========== Modal custom element (game detail) ============ */
+class GameModal extends HTMLElement {
+  constructor(){ super(); this._shadow = this.attachShadow({mode:'closed'}); }
+  connectedCallback(){
+    const tpl = document.getElementById('game-modal-template');
+    this._shadow.appendChild(tpl.content.cloneNode(true));
+    const closeBtn = this._shadow.querySelector('#closeBtn');
+    closeBtn.addEventListener('click', ()=> this.remove());
+    this._shadow.querySelector('#content').innerHTML = this.getAttribute('content') || '';
+    this._shadow.querySelector('.back').addEventListener('click',(e)=> {
+      if(e.target.classList.contains('back')) this.remove();
+    });
+  }
+}
+customElements.define('game-modal', GameModal);
+
+/* =========== Profile widget as custom element (Shadow DOM + protection) ============ */
+class ProfileWidget extends HTMLElement {
+  constructor(){ super(); this.attachShadow({mode:'open'}); }
+  connectedCallback(){
+    const mount = document.createElement('div');
+    mount.style.position = 'relative';
+    mount.innerHTML = `
+      <style>
+        .wrap{display:flex;align-items:center;gap:8px; cursor:pointer; user-select:none}
+        .avatar{width:38px;height:38px;border-radius:9px; overflow:hidden; position:relative; flex-shrink:0}
+        .avatar img{width:100%; height:100%; object-fit:cover; display:block}
+        .overlay{position:absolute; inset:0; background:linear-gradient(180deg, transparent, rgba(2,4,10,0.25)); opacity:0; transition:opacity .18s}
+        .wrap:hover .overlay{opacity:1}
+      </style>
+      <div class="wrap" id="wrap" title="Profil">
+        <div class="avatar" id="av">
+          <!-- image loaded with protections -->
+        </div>
+        <div class="hidden sm:block text-sm text-slate-200">Guest</div>
+      </div>
+    `;
+    this.shadowRoot.appendChild(mount);
+
+    const av = this.shadowRoot.querySelector('#av');
+    // protected image element
+    const img = document.createElement('img');
+    img.alt = 'Profile';
+    img.src = 'https://files.catbox.moe/byftzo.jpg';
+    img.draggable = false;
+    img.style.pointerEvents = 'auto';
+    // disable contextmenu on the image element
+    img.addEventListener('contextmenu', (e)=> { e.preventDefault(); notify('Menyimpan gambar dinonaktifkan.') });
+    // prevent dragstart
+    img.addEventListener('dragstart', (e)=> e.preventDefault());
+    // overlay element to block long-press save on mobile (transparent)
+    const protective = document.createElement('div');
+    protective.className = 'overlay';
+    protective.style.position = 'absolute';
+    protective.style.inset = '0';
+    protective.style.zIndex = '5';
+    protective.style.touchAction = 'none'; // help block some default mobile gestures
+
+    // append
+    av.appendChild(img);
+    av.appendChild(protective);
+
+    // click opens profile panel
+    this.shadowRoot.querySelector('#wrap').addEventListener('click', ()=> {
+      notify('Halo, Guest! Buka profil untuk info lebih lanjut.');
+      // quick small modal using main document custom modal
+      const d = { title:'Guest Player', desc:'Tidak terautentikasi. Silakan login.' };
+      openGameModal({title:'Profil', genre:'Akun', rating:0, img:img.src, desc:'Silakan masuk untuk menyimpan progres.'});
+    });
+  }
+}
+customElements.define('profile-widget', ProfileWidget);
+
+/* =========== render game grid, filters ============ */
+function renderGameGrid(list = GAMES) {
+  const grid = document.getElementById('gameGrid');
+  grid.innerHTML = '';
+  list.forEach(g=>{
+    const el = document.createElement('game-card');
+    el.setAttribute('data', JSON.stringify(g));
+    grid.appendChild(el);
+  });
+}
+
+/* =========== open modal helper ============ */
+function openGameModal(data) {
+  const m = document.createElement('game-modal');
+  const html = `
+    <div style="display:flex;gap:14px">
+      <div style="width:40%;min-width:220px"><img style="width:100%;height:auto;border-radius:8px" src="${data.img}" alt="${data.title}"></div>
+      <div style="flex:1">
+        <h3 style="font-size:20px;margin:0 0 6px 0">${data.title}</h3>
+        <div style="color:rgba(255,255,255,0.7)">${data.genre} · Rating: ${data.rating}</div>
+        <p style="margin-top:12px;color:rgba(255,255,255,0.8)">${data.desc}</p>
+        <div style="margin-top:14px"><button id="playBtn" class="glow-btn" style="padding:8px 14px;border-radius:10px;background:linear-gradient(90deg,#6EE7FF,#A78BFA);color:#000;font-weight:700">Main Sekarang</button></div>
+      </div>
+    </div>`;
+  m.setAttribute('content', html);
+  document.body.appendChild(m);
+
+  // listen to play click inside shadow (closed shadow used -> attach via event delegation)
+  setTimeout(()=>{
+    const btn = m.shadowRoot ? m.shadowRoot.querySelector('#content').querySelector('#playBtn') : null;
+    if(btn) btn.addEventListener('click', ()=> {
+      notify('Memulai game...');
+      m.remove();
+    });
+  }, 120);
+}
+
+/* =========== Filters ============ */
+function populateFilters(){
+  const genres = [...new Set(GAMES.map(g=>g.genre))];
+  const sel = document.getElementById('genreFilter');
+  genres.forEach(g => {
+    const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o);
+  });
+  document.getElementById('ratingFilter').addEventListener('change', applyFilters);
+  sel.addEventListener('change', applyFilters);
+}
+function applyFilters(){
+  const genre = document.getElementById('genreFilter').value;
+  const rating = document.getElementById('ratingFilter').value;
+  let list = GAMES.slice();
+  if(genre !== 'all') list = list.filter(g=>g.genre===genre);
+  if(rating !== 'all') list = list.filter(g=>g.rating >= parseFloat(rating));
+  renderGameGrid(list);
+}
+
+/* =========== Intersection Observer for entrance animations ============ */
+function setupIO(){
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) {
+        e.target.classList.add('animate-enter');
+        e.target.style.transition = 'transform .6s cubic-bezier(.2,.9,.2,1), opacity .6s';
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.opacity = '1';
+        obs.unobserve(e.target);
       }
     });
+  }, {threshold:0.15});
 
-    container.append(info, input, btn, out);
-    resetBtn.classList.remove('hidden');
+  document.querySelectorAll('section, .game-card').forEach((el)=>{
+    el.style.transform = 'translateY(12px)';
+    el.style.opacity = '0';
+    obs.observe(el);
+  });
+}
+
+/* =========== Canvas background animation (particles + parallax) ============ */
+function setupCanvas(){
+  const c = document.getElementById('bgCanvas');
+  const ctx = c.getContext('2d');
+  let w= (c.width = innerWidth), h = (c.height = innerHeight);
+  window.addEventListener('resize', ()=>{ w=c.width=innerWidth; h=c.height=innerHeight; });
+  const particles = Array.from({length: Math.round(w*h/90000)}, (_,i)=>({
+    x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.6+0.7, vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.2, hue: Math.random()*360
+  }));
+  let mx= w/2, my=h/2;
+  addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{
+      p.x += p.vx + (mx-w/2)*0.0002;
+      p.y += p.vy + (my-h/2)*0.0002;
+      if(p.x < -10) p.x = w+10;
+      if(p.x > w+10) p.x = -10;
+      if(p.y < -10) p.y = h+10;
+      if(p.y > h+10) p.y = -10;
+      ctx.beginPath();
+      const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*8);
+      g.addColorStop(0, `rgba(110,231,255,0.14)`);
+      g.addColorStop(1, `rgba(10,10,18,0)`);
+      ctx.fillStyle = g;
+      ctx.arc(p.x,p.y,p.r*6,0,Math.PI*2);
+      ctx.fill();
+    });
+    requestAnimationFrame(frame);
   }
+  frame();
+}
 
-  /* ===========================
-     Game 2 - Batu Gunting Kertas
-     =========================== */
-  function game2(container, reset=false) {
-    gameTitle.textContent = '2. Batu-Gunting-Kertas';
-    const choices = ['Batu','Gunting','Kertas'];
-    container.innerHTML = '';
-    const info = el('div',{class:'mb-3 text-slate-600'},'Pilih salah satu:');
-    const buttons = el('div',{class:'flex gap-2'});
-    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+/* =========== Web Worker example (simulate background rating calc) ============ */
+let ratingWorker;
+function startWorker(){
+  const workerBlob = new Blob([`
+    self.onmessage = function(e){
+      // simple heavy-ish calculation mock
+      const games = e.data;
+      const out = games.map(g=>({id:g.id, score: Math.round((g.rating*100 + Math.random()*10))}));
+      // simulate delay
+      setTimeout(()=> self.postMessage(out), 300);
+    };
+  `], {type:'application/javascript'});
+  ratingWorker = new Worker(URL.createObjectURL(workerBlob));
+  ratingWorker.onmessage = function(e){
+    // apply minor UI changes (not critical)
+    // console.log('Worker result', e.data);
+  };
+  ratingWorker.postMessage(GAMES);
+}
 
-    choices.forEach(c=>{
-      const b = el('button',{class:'px-3 py-2 bg-slate-100 rounded hover:bg-slate-200'},c);
-      b.addEventListener('click', ()=>{
-        const comp = choices[Math.floor(Math.random()*3)];
-        let res = 'Seri';
-        if ((c==='Batu'&&comp==='Gunting')||(c==='Gunting'&&comp==='Kertas')||(c==='Kertas'&&comp==='Batu')) res='Kamu Menang!';
-        else if (c===comp) res='Seri';
-        else res='Kamu Kalah';
-        out.textContent = `Kamu: ${c} — Komputer: ${comp} → ${res}`;
+/* =========== Service worker (PWA) registered via blob -> caches shell -> enables offline basic PWA behavior ============ */
+function registerServiceWorker(){
+  if('serviceWorker' in navigator){
+    const swCode = `
+      const CACHE = 'ruang-game-v1';
+      const assets = ['./'];
+      self.addEventListener('install', e => {
+        self.skipWaiting();
+        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(assets)));
       });
-      buttons.appendChild(b);
-    });
-
-    container.append(info, buttons, out);
-    resetBtn.classList.remove('hidden');
-  }
-
-  /* ===========================
-     Game 3 - Memory Pair (4x3)
-     =========================== */
-  function game3(container, reset=false) {
-    gameTitle.textContent = '3. Memory Pair (Cocokkan pasangan)';
-    container.innerHTML = '';
-    const size = 12; // 6 pairs
-    if (!gameState.g3 || reset) {
-      // generate pairs
-      const icons = ['🍎','🍌','🍇','🍓','🍍','🥝'];
-      let arr = icons.concat(icons);
-      arr = arr.sort(()=>Math.random()-0.5);
-      gameState.g3 = { arr, revealed: Array(size).fill(false), matched: Array(size).fill(false), first:null, moves:0 };
-    }
-    const state = gameState.g3;
-    const grid = el('div',{class:'grid grid-cols-4 gap-3'});
-    const status = el('div',{class:'mt-3 text-sm text-slate-700'},`Moves: ${state.moves}`);
-
-    function render() {
-      grid.innerHTML='';
-      for (let i=0;i<size;i++) {
-        const cell = el('button',{class:'h-20 bg-slate-100 rounded text-2xl flex items-center justify-center'}, state.matched[i]? state.arr[i] : (state.revealed[i]? state.arr[i] : ''));
-        if (!state.matched[i] && !state.revealed[i]) cell.textContent = '';
-        cell.addEventListener('click', ()=>{
-          if (state.matched[i] || state.revealed[i]) return;
-          state.revealed[i]=true;
-          if (state.first===null) {
-            state.first=i;
-            render();
-            return;
-          } else {
-            const j = state.first;
-            state.moves++;
-            render();
-            if (state.arr[i]===state.arr[j]) {
-              state.matched[i]=state.matched[j]=true;
-              state.first=null;
-            } else {
-              // hide after short delay
-              setTimeout(()=>{ state.revealed[i]=state.revealed[j]=false; state.first=null; render(); },700);
-            }
-            status.textContent = `Moves: ${state.moves}`;
-            // win check
-            if (state.matched.every(Boolean)) {
-              status.textContent = `Selesai! Moves: ${state.moves}`;
-            }
-          }
-        });
-        grid.appendChild(cell);
-      }
-    }
-
-    render();
-    container.append(grid, status);
-    resetBtn.classList.remove('hidden');
-  }
-
-  /* ===========================
-     Game 4 - Reaction Time
-     =========================== */
-  function game4(container, reset=false) {
-    gameTitle.textContent = '4. Reaction Time';
-    container.innerHTML = '';
-    if (!gameState.g4 || reset) gameState.g4 = { running:false, start:0, best: null };
-
-    const state = gameState.g4;
-    const info = el('div',{class:'mb-3 text-slate-600'},'Tunggu layar berubah warna, lalu klik secepat mungkin.');
-    const panel = el('div',{class:'w-full h-40 bg-slate-100 rounded flex items-center justify-center text-xl font-medium'},'Klik untuk mulai');
-    const best = el('div',{class:'mt-3 text-sm text-slate-700'}, state.best ? `Best: ${state.best} ms` : 'Belum ada best');
-
-    let timeoutId = null;
-
-    function startRound() {
-      panel.textContent = 'Bersiap...';
-      panel.className = 'w-full h-40 bg-slate-100 rounded flex items-center justify-center text-xl font-medium';
-      timeoutId = setTimeout(()=> {
-        state.start = performance.now();
-        state.running = true;
-        panel.textContent = 'Klik!';
-        panel.className = 'w-full h-40 bg-emerald-400 rounded flex items-center justify-center text-xl font-medium text-white';
-      }, 800 + Math.random()*2000);
-    }
-
-    panel.addEventListener('click', ()=>{
-      if (!state.running && timeoutId===null) {
-        // start
-        startRound();
-        timeoutId = 'started';
-        return;
-      }
-      if (state.running) {
-        const delta = Math.round(performance.now() - state.start);
-        panel.textContent = `${delta} ms`;
-        state.running = false;
-        timeoutId = null;
-        if (!state.best || delta < state.best) state.best = delta;
-        best.textContent = `Best: ${state.best} ms`;
-        // auto new round after short delay
-        setTimeout(()=> startRound(), 800);
-      } else {
-        // clicked too early
-        panel.textContent = 'Terlalu cepat! Mulai lagi';
-        clearTimeout(timeoutId);
-        timeoutId = null;
-        setTimeout(()=> startRound(), 800);
-      }
-    });
-
-    container.append(info, panel, best);
-    resetBtn.classList.remove('hidden');
-  }
-
-  /* ===========================
-     Game 5 - Trivia MCQ
-     =========================== */
-  function game5(container, reset=false) {
-    gameTitle.textContent = '5. Trivia (MCQ)';
-    container.innerHTML = '';
-    const questions = [
-      {q:'Apa ibu kota Indonesia?', opts:['Bandung','Jakarta','Surabaya','Medan'], a:1},
-      {q:'Bahasa pemrograman utama untuk web frontend?', opts:['Python','C++','JavaScript','Rust'], a:2},
-      {q:'Siapa yang memelihara server web?', opts:['Developer','DBA','Designer','Koki'], a:0}
-    ];
-    if (!gameState.g5 || reset) gameState.g5 = { idx:0, score:0 };
-    const state = gameState.g5;
-
-    function render() {
-      container.innerHTML='';
-      const cur = questions[state.idx];
-      const qEl = el('div',{class:'font-semibold mb-3'},`Q${state.idx+1}: ${cur.q}`);
-      const opts = el('div',{class:'grid gap-2'});
-      cur.opts.forEach((opt,i)=>{
-        const b = el('button',{class:'p-2 bg-slate-100 rounded text-left'}, opt);
-        b.addEventListener('click', ()=>{
-          if (i===cur.a) state.score++;
-          state.idx++;
-          if (state.idx>=questions.length) {
-            container.innerHTML = '';
-            container.append(el('div',{class:'text-lg font-semibold'},`Selesai! Score: ${state.score}/${questions.length}`),
-                             el('button',{class:'mt-3 px-3 py-2 bg-emerald-500 text-white rounded'},'Main lagi'));
-            container.querySelector('button').addEventListener('click', ()=> { gameState.g5 = null; game5(container,true); });
-            resetBtn.classList.remove('hidden');
-            return;
-          }
-          render();
-        });
-        opts.appendChild(b);
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
       });
-      container.append(qEl, opts);
-    }
-    render();
-    resetBtn.classList.remove('hidden');
+    `;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode], {type:'application/javascript'})))
+      .then(()=> console.log('SW registered'))
+      .catch(()=> console.log('SW failed'));
   }
+}
 
-  /* ===========================
-     Game 6 - Color Match
-     =========================== */
-  function game6(container, reset=false) {
-    gameTitle.textContent = '6. Color Match (Ketik warna teks, bukan warna font)';
-    container.innerHTML = '';
-    const colors = ['RED','GREEN','BLUE','YELLOW','PURPLE','ORANGE'];
-    function nextRound() {
-      const colorName = colors[Math.floor(Math.random()*colors.length)];
-      let colorVal = colors[Math.floor(Math.random()*colors.length)];
-      // ensure mismatch sometimes
-      if (Math.random() > 0.5) colorVal = colorName;
-      const word = el('div',{class:'text-3xl font-bold mb-3', style:`color:${colorVal.toLowerCase()}`}, colorName);
-      const input = el('input',{class:'border px-3 py-2 rounded','placeholder':'Ketik nama warna (contoh: red)'});
-      const btn = el('button',{class:'ml-2 px-3 py-2 bg-emerald-500 text-white rounded'},'Cek');
-      const out = el('div',{class:'mt-3 text-sm text-slate-700'});
+/* =========== Inject manifest as blob for PWA (so single-file remains) ============ */
+function injectManifest(){
+  const manifest = {
+    name: "Ruang Game",
+    short_name: "RuangGame",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#030317",
+    description: "Portal & game hub futuristik",
+    icons: [{src:'https://files.catbox.moe/byftzo.jpg', sizes:'192x192', type:'image/jpeg'}]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = url;
+  document.head.appendChild(link);
+}
 
-      return {word,input,btn,out};
-    }
+/* =========== Sound / background audio (optional toggle) ============ */
+function setupAudio(){
+  const a = document.createElement('audio');
+  a.src = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b5b1b6f6b.mp3?filename=cyberpunk-ambient-110239.mp3';
+  a.loop = true; a.preload = 'none';
+  // create a small control UI
+  const ctrl = document.createElement('button');
+  ctrl.className = 'fixed left-4 bottom-4 z-70 p-3 rounded-full';
+  ctrl.title = 'Audio';
+  ctrl.innerText = '♪';
+  ctrl.style.background = 'linear-gradient(90deg,#0f1724,#071129)';
+  ctrl.style.color = '#9AE6FF';
+  ctrl.style.boxShadow = '0 6px 18px rgba(6,12,24,0.6)';
+  let on=false;
+  ctrl.addEventListener('click', ()=> {
+    on = !on;
+    if(on){ a.play().catch(()=>notify('Autoplay dibatasi browser. Tekan lagi untuk putar.')); ctrl.style.opacity=1 } else { a.pause(); ctrl.style.opacity=0.7 }
+  });
+  document.body.appendChild(ctrl);
+  document.body.appendChild(a);
+}
 
-    const containerBox = el('div',{});
-    let round = nextRound();
-    containerBox.append(round.word, round.input, round.btn, round.out);
-    round.btn.addEventListener('click', ()=>{
-      const guess = round.input.value.trim().toUpperCase();
-      if (!guess) { round.out.textContent = 'Isi dulu'; return; }
-      // correct if matches the color word shown (i.e., the 'color of text' value)
-      // we check the computed style color of element word
-      const computed = getComputedStyle(round.word).color;
-      // map computed rgb to color name simplified
-      const mapping = {
-        'rgb(255, 0, 0)':'RED','rgb(0, 128, 0)':'GREEN','rgb(0, 0, 255)':'BLUE',
-        'rgb(255, 255, 0)':'YELLOW','rgb(128, 0, 128)':'PURPLE','rgb(255, 165, 0)':'ORANGE'
-      };
-      const actual = mapping[computed] || computed;
-      if (guess === actual) round.out.textContent = 'Benar!';
-      else round.out.textContent = `Salah. Warna sebenarnya: ${actual}`;
-      // new round
-      setTimeout(()=> {
-        containerBox.innerHTML = '';
-        round = nextRound();
-        containerBox.append(round.word, round.input, round.btn, round.out);
-      }, 900);
-    });
+/* =========== Prevent inspect-ish: minimal obfuscation-ish step
+   -> put some UI bits inside closed Shadow DOM / custom elements (done above).
+   -> avoid exposing some variables globally (scoped closures)
+   Note: these are deterrents only, not security. ============ */
 
-    container.append(containerBox);
-    resetBtn.classList.remove('hidden');
-  }
+/* =========== Initialize UI ============ */
+window.addEventListener('DOMContentLoaded', async ()=>{
+  document.getElementById('year').textContent = new Date().getFullYear();
+  renderHero();
+  renderGameGrid();
+  populateFilters();
+  setupIO();
+  setupCanvas();
+  startWorker();
+  injectManifest();
+  registerServiceWorker();
+  setupAudio();
 
-  /* ===========================
-     Game 7 - Whack-a-Box
-     =========================== */
-  function game7(container, reset=false) {
-    gameTitle.textContent = '7. Whack-a-Box (Klik kotak muncul)';
-    container.innerHTML = '';
-    if (!gameState.g7 || reset) gameState.g7 = { score:0, time:15, running:false, interval:null };
-    const state = gameState.g7;
-    const info = el('div',{class:'mb-3 text-slate-600'},`Klik kotak kuning sebanyak-banyaknya dalam ${state.time} detik`);
-    const board = el('div',{class:'grid grid-cols-4 gap-2'});
-    for (let i=0;i<8;i++){
-      const cell = el('div',{class:'h-20 bg-slate-100 rounded flex items-center justify-center text-2xl'});
-      board.appendChild(cell);
-    }
-    const scoreEl = el('div',{class:'mt-3 text-sm text-slate-700'},`Score: ${state.score}`);
-    const timerEl = el('div',{class:'mt-1 text-sm text-slate-700'},`Time: ${state.time}s`);
-    const start = el('button',{class:'mt-3 px-3 py-2 bg-emerald-500 text-white rounded'},'Start');
+  // mount profile inside main profile section (extra)
+  const mount = document.getElementById('profileShadowMount');
+  const profileEl = document.createElement('profile-widget');
+  mount.appendChild(profileEl);
 
-    function spawn() {
-      // clear
-      [...board.children].forEach(c=>{ c.textContent=''; c.classList.remove('bg-yellow-300'); });
-      const i = Math.floor(Math.random()*board.children.length);
-      const item = board.children[i];
-      item.classList.add('bg-yellow-300');
-      item.textContent = '🔥';
-      item.addEventListener('click', hit);
-      setTimeout(()=>{ if (item) { item.textContent=''; item.classList.remove('bg-yellow-300'); item.removeEventListener('click', hit); } }, 900);
-    }
+  // loading hide
+  setTimeout(()=> {
+    document.getElementById('loading').style.display = 'none';
+  }, 900);
 
-    function hit(e) {
-      state.score++; scoreEl.textContent = `Score: ${state.score}`;
-      e.currentTarget.textContent=''; e.currentTarget.classList.remove('bg-yellow-300');
-      e.currentTarget.removeEventListener('click', hit);
-    }
+  // open modal via global event
+  window.addEventListener('open-game-modal', (e)=> openGameModal(e.detail));
+  window.addEventListener('open-game-modal', (e)=> console.log('open', e.detail));
 
-    start.addEventListener('click', ()=>{
-      if (state.running) return;
-      state.running = true;
-      state.score = 0; state.time = 15;
-      scoreEl.textContent = `Score: ${state.score}`; timerEl.textContent = `Time: ${state.time}s`;
-      state.interval = setInterval(()=> {
-        spawn();
-      }, 700);
-      const countdown = setInterval(()=> {
-        state.time--; timerEl.textContent = `Time: ${state.time}s`;
-        if (state.time<=0) {
-          clearInterval(countdown);
-          clearInterval(state.interval);
-          state.running=false;
-          alert(`Waktu habis! Score: ${state.score}`);
-        }
-      },1000);
-    });
+  // header notifications
+  document.getElementById('notifBtn').addEventListener('click', ()=> notify('Tidak ada notifikasi baru.'));
+  document.getElementById('playNow').addEventListener('click', ()=> {
+    notify('Mengarahkan ke game terpopuler...');
+    // simple simulated click to first game's explore
+    openGameModal(GAMES[0]);
+  });
 
-    container.append(info, board, scoreEl, timerEl, start);
-    resetBtn.classList.remove('hidden');
-  }
+  // topup / explore
+  document.getElementById('topupBtn').addEventListener('click', ()=> notify('Fitur Top Up belum tersedia.'));
+  document.getElementById('exploreBtn').addEventListener('click', ()=> document.getElementById('games').scrollIntoView({behavior:'smooth'}));
 
-  /* ===========================
-     Game 8 - Emoji Recall
-     =========================== */
-  function game8(container, reset=false) {
-    gameTitle.textContent = '8. Emoji Recall (ingat urutan)';
-    container.innerHTML = '';
-    const pool = ['😀','🍎','⚽','🚗','🐶','🌟','🎵','🍩'];
-    if (!gameState.g8 || reset) gameState.g8 = { seq:[], level:1, user:[], stage:'show' };
-    const state = gameState.g8;
+  // search/filters initial
+  applyFilters();
 
-    const info = el('div',{class:'mb-3 text-slate-600'},'Tonton urutan emoji, lalu ulangi klik urutan yang sama.');
-    const box = el('div',{class:'grid grid-cols-8 gap-2 mb-3'});
-    pool.forEach(em=>{
-      const b = el('button',{class:'h-12 rounded bg-slate-100 text-xl'}, em);
-      b.addEventListener('click', ()=>{
-        if (state.stage !== 'input') return;
-        state.user.push(em);
-        // check prefix
-        const idx = state.user.length - 1;
-        if (state.user[idx] !== state.seq[idx]) {
-          alert('Salah urutan! Game over.');
-          gameState.g8 = null; game8(container,true);
-          return;
-        }
-        if (state.user.length === state.seq.length) {
-          // level up
-          state.level++;
-          state.user=[];
-          startRound();
-        }
-      });
-      box.appendChild(b);
-    });
+  // logout btn
+  document.getElementById('logoutBtn').addEventListener('click', ()=> {
+    localStorage.clear();
+    notify('Logout berhasil.');
+  });
 
-    function startRound() {
-      state.seq = [];
-      for (let i=0;i<state.level;i++) state.seq.push(pool[Math.floor(Math.random()*pool.length)]);
-      // show sequence
-      state.stage='show';
-      let i=0;
-      const display = el('div',{class:'text-3xl mb-3'},'');
-      container.querySelectorAll('.display')?.forEach(n=>n.remove?.());
-      container.insertBefore(display, box);
-      const interval = setInterval(()=> {
-        display.textContent = state.seq[i];
-        i++;
-        if (i>=state.seq.length) {
-          clearInterval(interval);
-          display.textContent = 'Sekarang giliranmu...';
-          state.stage='input';
-        }
-      }, 700);
-    }
-
-    container.append(info, box);
-    startRound();
-    resetBtn.classList.remove('hidden');
-  }
-
-  /* ===========================
-     Game 9 - Hitung Bentuk
-     =========================== */
-  function game9(container, reset=false) {
-    gameTitle.textContent = '9. Hitung Bentuk (Berapa banyak lingkaran?)';
-    container.innerHTML = '';
-    function generate() {
-      const total = 6 + Math.floor(Math.random()*6); // 6..11
-      const circles = Math.floor(3 + Math.random()*5); // 3..7
-      // build grid with mix of circles & squares
-      const items = [];
-      for (let i=0;i<total;i++) items.push(i<circles? 'circle' : 'square');
-      // shuffle
-      items.sort(()=>Math.random()-0.5);
-      return {items, circles};
-    }
-    const g = generate();
-    const grid = el('div',{class:'grid grid-cols-6 gap-2'});
-    g.items.forEach(t=>{
-      const cell = el('div',{class:'h-12 flex items-center justify-center rounded'});
-      if (t==='circle') {
-        cell.className += ' bg-emerald-300 rounded-full';
-      } else {
-        cell.className += ' bg-slate-300';
-      }
-      grid.appendChild(cell);
-    });
-    const prompt = el('div',{class:'mb-3 text-slate-700'},'Berapa banyak lingkaran?');
-    const input = el('input',{class:'border px-3 py-2 rounded w-32','type':'number','placeholder':'Jawaban'});
-    const btn = el('button',{class:'ml-2 px-3 py-2 bg-emerald-500 text-white rounded'},'Cek');
-    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
-
-    btn.addEventListener('click', ()=>{
-      const v = Number(input.value);
-      if (v===g.circles) out.textContent = `Benar! Ada ${g.circles} lingkaran.`;
-      else out.textContent = `Salah. Jawaban: ${g.circles}.`;
-    });
-
-    container.append(prompt, grid, input, btn, out);
-    resetBtn.classList.remove('hidden');
-  }
-
-  /* ===========================
-     Game 10 - Typing Sprint
-     =========================== */
-  function game10(container, reset=false) {
-    gameTitle.textContent = '10. Typing Sprint (Ketik kalimat secepat mungkin)';
-    container.innerHTML = '';
-    const sentences = [
-      'aku suka coding',
-      'jangan lupa senyum hari ini',
-      'website cepat itu penting',
-      'jaga kualitas, kerja cepat'
-    ];
-    if (!gameState.g10 || reset) gameState.g10 = { sentence: sentences[Math.floor(Math.random()*sentences.length)], start:0, running:false };
-    const state = gameState.g10;
-    const prompt = el('div',{class:'mb-3 font-semibold'}, state.sentence);
-    const input = el('input',{class:'border px-3 py-2 rounded w-full','placeholder':'Ketik di sini...'});
-    const btn = el('button',{class:'mt-3 px-3 py-2 bg-emerald-500 text-white rounded'},'Mulai / Submit');
-    const out = el('div',{class:'mt-3 text-sm text-slate-700'});
-
-    btn.addEventListener('click', ()=> {
-      if (!state.running) {
-        state.running = true;
-        state.start = performance.now();
-        out.textContent = 'Waktu berjalan...';
-        btn.textContent = 'Submit';
-        input.focus();
-        return;
-      }
-      const elapsed = Math.round(performance.now() - state.start);
-      const typed = input.value.trim();
-      if (typed === state.sentence) out.textContent = `Benar! Waktu: ${elapsed} ms`;
-      else out.textContent = `Teks tidak cocok. Waktu: ${elapsed} ms (coba lagi)`;
-      state.running=false;
-      btn.textContent='Mulai / Submit';
-    });
-
-    container.append(prompt, input, btn, out);
-    resetBtn.classList.remove('hidden');
-  }
-
-  /* START GAME SELECTOR */
-  function startGame(id, forceReset=false) {
-    activeGame = id;
-    gameArea.innerHTML = '';
-    // map id to fn
-    switch(id) {
-      case 1: game1(gameArea, forceReset); break;
-      case 2: game2(gameArea, forceReset); break;
-      case 3: game3(gameArea, forceReset); break;
-      case 4: game4(gameArea, forceReset); break;
-      case 5: game5(gameArea, forceReset); break;
-      case 6: game6(gameArea, forceReset); break;
-      case 7: game7(gameArea, forceReset); break;
-      case 8: game8(gameArea, forceReset); break;
-      case 9: game9(gameArea, forceReset); break;
-      case 10: game10(gameArea, forceReset); break;
-      default: gameArea.textContent = 'Game belum tersedia.'; resetBtn.classList.add('hidden');
-    }
-  }
-
-  // Accessibility: close any modal / reset on Escape -> just reset active game state to initial (soft)
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      // reset active game
-      if (activeGame) startGame(activeGame, true);
+  // keyboard shortcut: press F to favorite first game (demo)
+  document.addEventListener('keydown', (e)=>{
+    if(e.key.toLowerCase() === 'f') {
+      const favs = JSON.parse(localStorage.getItem('rg_favs')||'[]');
+      if(!favs.includes(GAMES[0].id)){ favs.push(GAMES[0].id); localStorage.setItem('rg_favs', JSON.stringify(favs)); notify('Favorit cepat ditambahkan!'); }
+      else notify('Sudah favorit.');
     }
   });
 
-  // Prevent long-touch saving images on mobile by using CSS; extra precaution:
-  document.querySelectorAll('img').forEach(i => {
-    i.addEventListener('dragstart', e => e.preventDefault());
+  // lazy loading images inside game cards (mutation observer)
+  const mo = new MutationObserver((muts)=>{
+    muts.forEach(m=>{
+      m.addedNodes.forEach(node=>{
+        if(node.nodeType===1 && node.tagName === 'GAME-CARD'){
+          // nothing to do - thumbs already use background urls. Could enhance to lazy load if big images.
+        }
+      });
+    });
   });
+  mo.observe(document.getElementById('gameGrid'), {childList:true});
+});
 
-  </script>
+/* =========== Extra: small fallback for touch long-press context menu on profile image -> prevent selection/save ============ */
+document.addEventListener('contextmenu', function(e){
+  // allow context menu everywhere except profile avatar overlays
+  if(e.target && (e.target.closest && (e.target.closest('profile-widget') || e.target.closest('#profileShadowMount')))) {
+    e.preventDefault();
+    notify('Menyimpan gambar dinonaktifkan pada profil.');
+  }
+}, {passive:false});
+
+/* =========== Small performance tweaks: throttle resize tasks ============ */
+let resizeTimer;
+window.addEventListener('resize', ()=> {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(()=> { /* placeholder: could recalc layout */ }, 250);
+});
+</script>
+
 </body>
 </html>
