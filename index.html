@@ -4,741 +4,355 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Jiyy Eazy — Visitor Counter</title>
-
-  <!-- Meta / theme -->
-  <meta name="theme-color" content="#0f172a">
   <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!-- GSAP CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
   <style>
-    /* ========== BASE + THEME ========== */
+    /* ------------------ Reset & base ------------------ */
     :root{
-      --bg:#0b1220;
-      --panel:#0f172a;
-      --muted:#98a0b3;
-      --accent:#7c5cff;
-      --glass: rgba(255,255,255,0.04);
-      --card-shadow: 0 8px 30px rgba(2,6,23,0.6);
-      --glass-2: rgba(255,255,255,0.03);
-      --accent-2:#22c1c3;
-      color-scheme: dark;
+      --bg:#0f172a; --card:#0b1220; --muted:#94a3b8; --accent:#7c3aed; --glass:rgba(255,255,255,0.04); --text:#e6eef8;
     }
-    [data-theme="light"] {
-      --bg:#f6f8fb;
-      --panel:#ffffff;
-      --muted:#6b7280;
-      --accent:#6b21a8;
-      --glass: rgba(12,18,30,0.03);
-      --card-shadow: 0 8px 30px rgba(18,20,30,0.08);
-      --accent-2:#059669;
-      --glass-2: rgba(2,6,23,0.02);
-      color-scheme: light;
+    .light{
+      --bg:#f6f8fb; --card:#ffffff; --muted:#5b6b7a; --accent:#7c3aed; --glass:rgba(12,18,30,0.03); --text:#071029;
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.12), transparent 6%),
-        radial-gradient(900px 400px at 90% 90%, rgba(34,193,195,0.06), transparent 8%),
-        var(--bg);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color: #e6eef8;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:32px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      gap:24px;
+      margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background:linear-gradient(180deg,var(--bg), #071029); color:var(--text); -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale; padding:24px;
     }
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
+    h1{margin:0;font-size:20px}
+    .controls{display:flex;gap:10px;align-items:center}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;cursor:pointer}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:16px;border-radius:16px;box-shadow:0 6px 20px rgba(2,6,23,0.5);backdrop-filter: blur(6px);}
 
-    /* Container */
-    .container{
-      width:100%;
-      max-width:1100px;
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:20px;
-      align-items:start;
-    }
-    @media (max-width:900px){
-      .container{grid-template-columns:1fr; padding-bottom:60px}
-    }
-
-    /* Left panel (branding + counter + controls) */
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), var(--glass));
-      border-radius:18px;
-      padding:20px;
-      box-shadow:var(--card-shadow);
-      backdrop-filter: blur(8px) saturate(120%);
-      border: 1px solid rgba(255,255,255,0.03);
-    }
-
-    .branding{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-bottom:14px;
-    }
-    .logo{
-      width:64px;
-      height:64px;
-      border-radius:14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      font-size:20px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color:white;
-      box-shadow: 0 8px 24px rgba(124,92,255,0.18), inset 0 -8px 30px rgba(0,0,0,0.15);
-      user-select:none;
-    }
-    .brand-text{
-      line-height:1;
-    }
-    .brand-text h1{
-      margin:0;
-      font-size:18px;
-      letter-spacing:0.4px;
-    }
-    .brand-text p{
-      margin:0;
-      margin-top:4px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    /* Visitor big counter */
-    .counter-wrap{
-      margin-top:8px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      align-items:center;
-      text-align:center;
-    }
-    .count-number{
-      font-size:56px;
-      font-weight:800;
-      letter-spacing:1px;
-      background: linear-gradient(180deg, #fff, rgba(255,255,255,0.7));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-    }
-    .count-meta{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    /* Controls */
-    .controls{
-      display:flex;
-      gap:8px;
-      margin-top:8px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-    .btn{
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.06);
-      padding:8px 12px;
-      border-radius:10px;
-      cursor:pointer;
-      color:inherit;
-      font-weight:600;
-      font-size:13px;
-      transition:transform .18s ease, background .18s;
-    }
-    .btn:hover{transform:translateY(-4px)}
-    .btn.primary{
-      background: linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:white;
-      border:0;
-      box-shadow: 0 8px 30px rgba(124,92,255,0.12);
-    }
-
-    /* Personalization input */
-    .personal{
-      display:flex;
-      gap:8px;
-      margin-top:12px;
-      align-items:center;
-      justify-content:center;
-    }
-    .personal input{
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.04);
-      background:transparent;
-      color:inherit;
-      outline:none;
-      min-width:160px;
-    }
-
-    /* Right area (chart + details) */
-    .right{
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .card h2{margin:0; font-size:16px}
-    .meta-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    /* Left column */
+    .hero{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:16px}
+    .big-counter{font-size:48px;font-weight:800;letter-spacing:1px}
+    .meta{color:var(--muted);font-size:14px}
+    .row{display:flex;gap:12px;align-items:center}
+    input[type=text]{padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);width:100%;font-size:14px}
 
     /* Chart area */
-    .chart-card{
-      padding:18px;
-    }
-    #chartLegend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .chip{
-      padding:6px 10px;
-      border-radius:999px;
-      background:var(--glass-2);
-      font-size:13px;
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,0.02);
-    }
-    .chip.active{
-      background: linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:white;
-      border:0;
-      transform:translateY(-2px);
-    }
+    .chart-card{padding:16px}
+    canvas{max-width:100%}
 
-    /* last visit + share area */
-    .info-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-    .small{
-      font-size:13px;
-      color:var(--muted);
-    }
+    /* Right column */
+    .side{display:flex;flex-direction:column;gap:12px}
+    .small{font-size:13px;color:var(--muted)}
+    .share{display:flex;gap:8px}
+    .share a{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--text);background:var(--glass)}
 
-    /* footer note */
-    .note{
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-      text-align:center;
-    }
+    footer{grid-column:1 / -1;margin-top:18px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
 
-    /* Responsive tweaks */
-    @media (max-width:480px){
-      .count-number{font-size:40px}
-      .logo{width:56px;height:56px}
-      .container{padding:12px}
-    }
-
-    /* small helper */
-    .muted{color:var(--muted); font-size:13px}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr} .logo{width:44px;height:44px}}
   </style>
 </head>
 <body>
-  <div class="container" id="app">
-    <!-- LEFT: Branding + Counter -->
-    <div class="card" aria-live="polite">
-      <div class="branding">
-        <div class="logo" id="logo">JE</div>
-        <div class="brand-text">
-          <h1>Jiyy Eazy</h1>
-          <p>Visitor Counter • Interaktif • Modern</p>
+  <div class="wrap">
+    <div>
+      <header>
+        <div class="brand">
+          <div class="logo">JZ</div>
+          <div>
+            <h1>Jiyy Eazy</h1>
+            <div class="meta">Halaman penghitungan pengunjung sederhana & modern</div>
+          </div>
         </div>
-      </div>
-
-      <!-- Main Counter -->
-      <div class="counter-wrap">
-        <div class="count-number" id="visitorCount" aria-label="Jumlah Pengunjung">0</div>
-        <div class="count-meta" id="greeting">Halo! Selamat datang.</div>
-
-        <!-- Controls -->
         <div class="controls">
-          <button class="btn primary" id="incBtn" title="Tambah manual">+ Tambah</button>
-          <button class="btn" id="themeToggle" title="Ganti tema">Mode Gelap/Terang</button>
-          <button class="btn" id="soundToggle" title="Aktifkan/Nonaktifkan suara">Suara: On</button>
+          <button id="themeToggle" class="btn" title="Toggle theme">Toggle Theme</button>
+          <button id="resetBtn" class="btn" title="Reset data">Reset</button>
         </div>
+      </header>
 
-        <!-- input nama -->
-        <div class="personal" role="form" aria-label="Form Personal">
-          <input id="nameInput" type="text" placeholder="Masukkan namamu..." />
-          <button class="btn" id="saveName">Simpan</button>
-        </div>
-
-        <div class="note" id="lastVisitNote">Kunjungan terakhir: -</div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Chart + Info -->
-    <div class="right">
-      <div class="card chart-card">
-        <div class="meta-row">
-          <h2>Grafik Pengunjung</h2>
+      <section class="card hero">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
           <div>
-            <span class="small muted">Mode:</span>
-            <span id="modeLabel" class="small">Harian</span>
+            <div class="big-counter" id="counterDisplay">0</div>
+            <div class="meta">Total pengunjung (disimpan di <code>localStorage</code>)</div>
+          </div>
+          <div style="min-width:180px">
+            <label class="small">Nama Anda</label>
+            <input id="nameInput" type="text" placeholder="Masukkan nama..." />
+            <div style="height:8px"></div>
+            <div class="meta">Terakhir kunjungan: <span id="lastVisit">-</span></div>
           </div>
         </div>
 
-        <!-- Canvas for Chart.js -->
-        <canvas id="visitorChart" height="120"></canvas>
-
-        <!-- chart controls -->
-        <div id="chartLegend">
-          <button class="chip active" data-mode="daily">Harian</button>
-          <button class="chip" data-mode="weekly">Mingguan</button>
-          <button class="chip" data-mode="monthly">Bulanan</button>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+          <button id="addVisitorNow" class="btn">Tambah pengunjung (simulasi)</button>
+          <div id="greeting" class="meta">Halo —</div>
         </div>
-      </div>
+      </section>
 
-      <!-- Info + Sharing -->
+      <section class="card chart-card" style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <strong>Grafik kunjungan</strong>
+            <div class="small">Pilih rentang untuk melihat data harian / mingguan / bulanan</div>
+          </div>
+          <div>
+            <select id="rangeSelect" class="btn">
+              <option value="7">7 hari (harian)</option>
+              <option value="30">30 hari (harian)</option>
+              <option value="90">90 hari (3 bulan)</option>
+              <option value="365">365 hari (tahunan)</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="visitorsChart" height="120"></canvas>
+      </section>
+
+    </div>
+
+    <aside class="side">
       <div class="card">
-        <div class="meta-row" style="align-items:center">
-          <div>
-            <h2>Informasi Kunjungan</h2>
-            <div class="small">Data disimpan di device (localStorage).</div>
-          </div>
-          <div style="text-align:right">
-            <div class="small">Tema saat ini:</div>
-            <div id="currentTheme" class="muted">-</div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px" class="info-grid">
-          <div>
-            <div class="small">Nama Pengunjung</div>
-            <div id="displayName" style="font-weight:700">-</div>
-          </div>
-          <div>
-            <div class="small">Kunjungan terakhir</div>
-            <div id="lastVisit" style="font-weight:700">-</div>
-          </div>
-        </div>
-
-        <div style="margin-top:16px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap">
-          <button class="btn" id="shareTwitter">Bagikan ke Twitter</button>
-          <button class="btn" id="shareFacebook">Bagikan ke Facebook</button>
-        </div>
-
-        <div style="margin-top:12px" class="note">
-          Efek suara saat angka bertambah & animasi GSAP aktif.
-        </div>
+        <h3 style="margin-top:0">Informasi singkat</h3>
+        <div class="small">Pesan: <strong>Jiyy Eazy</strong></div>
+        <div style="height:8px"></div>
+        <div class="small">Theme: <span id="themeLabel">Dark</span></div>
+        <div style="height:8px"></div>
+        <div class="small">Tanggal kunjungan terakhir:</div>
+        <div id="lastVisitBig" style="font-weight:700">-</div>
       </div>
 
-      <div style="text-align:center" class="muted">© <strong>Jiyy Eazy</strong> • Demo</div>
-    </div>
+      <div class="card">
+        <h4 style="margin-top:0">Bagikan</h4>
+        <div class="share">
+          <a id="shareTwitter" target="_blank" rel="noopener">Twitter</a>
+          <a id="shareFacebook" target="_blank" rel="noopener">Facebook</a>
+        </div>
+        <div style="height:8px"></div>
+        <div class="small">Suara saat bertambah: <label style="margin-left:6px"><input type="checkbox" id="soundToggle" checked /> Aktif</label></div>
+      </div>
+
+      <div class="card">
+        <h4 style="margin-top:0">Tentang</h4>
+        <div class="small">Halaman ini menyimpan data pengunjung per-tanggal, preferensi tema, dan nama di localStorage sehingga persistensinya ada pada browser Anda.</div>
+      </div>
+    </aside>
+
+    <footer>
+      <div>Built with ❤️ — Jiyy Eazy</div>
+      <div class="small">Local-only demo • Data tersimpan di browser Anda</div>
+    </footer>
   </div>
 
-  <!-- ====== JAVASCRIPT: Logic, localStorage, Chart.js, GSAP, Sound ====== -->
   <script>
-    /* ---------------------
-       Utility: tanggal format
-       --------------------- */
-    function formatDateTime(ts) {
-      const d = new Date(ts);
-      const pad = n => String(n).padStart(2,'0');
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  // -------------------- Helper utilities --------------------
+  const qs = s => document.querySelector(s);
+  const formatDate = d => new Date(d).toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'});
+  const todayKey = () => {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  // -------------------- Local storage keys --------------------
+  const KEY = 'jiyy_eazy_v1';
+
+  // Default structure saved in localStorage
+  const defaultState = {
+    total: 0,                 // total pengunjung sejauh ini
+    visits: {},               // object { 'YYYY-MM-DD': count }
+    lastVisit: null,          // ISO string
+    name: '',
+    theme: 'dark'
+  };
+
+  // Read from storage or return default
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : defaultState;
+    }catch(e){console.error('loadState',e); return defaultState}
+  }
+  function saveState(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  // -------------------- App init --------------------
+  let state = loadState();
+
+  // Apply theme
+  function applyTheme(theme){
+    if(theme === 'light') document.documentElement.classList.add('light');
+    else document.documentElement.classList.remove('light');
+    qs('#themeLabel').textContent = theme === 'light' ? 'Light' : 'Dark';
+  }
+  applyTheme(state.theme || 'dark');
+
+  // Elements
+  const counterDisplay = qs('#counterDisplay');
+  const lastVisitEl = qs('#lastVisit');
+  const lastVisitBig = qs('#lastVisitBig');
+  const nameInput = qs('#nameInput');
+  const greeting = qs('#greeting');
+  const addVisitorNow = qs('#addVisitorNow');
+  const themeToggle = qs('#themeToggle');
+  const resetBtn = qs('#resetBtn');
+  const shareTwitter = qs('#shareTwitter');
+  const shareFacebook = qs('#shareFacebook');
+  const rangeSelect = qs('#rangeSelect');
+  const soundToggle = qs('#soundToggle');
+
+  // Initialize UI from state
+  function refreshUI(){
+    // Counter with GSAP tween for smooth increment
+    gsap.to({}, {duration:0.6, onUpdate: () => {}, onComplete: ()=>{}});
+    animateCount(parseInt(counterDisplay.dataset.current||'0'), state.total);
+
+    lastVisitEl.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
+    lastVisitBig.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
+    nameInput.value = state.name || '';
+    greeting.textContent = state.name ? `Halo, ${state.name}!` : 'Halo — silakan masukkan nama di samping.';
+    applyTheme(state.theme || 'dark');
+  }
+
+  // Animate number change using GSAP
+  function animateCount(from, to){
+    // store current for subsequent calls
+    counterDisplay.dataset.current = to;
+    gsap.fromTo(counterDisplay, {innerText: from}, {duration:0.8, innerText: to, snap:{innerText:1}, ease:'power3.out', onUpdate(){ counterDisplay.textContent = Math.floor(this.targets()[0].innerText); }});
+  }
+
+  // -------------------- Visitor logic --------------------
+  function recordVisit(inc=1){
+    const key = todayKey();
+    state.total = (state.total || 0) + inc;
+    state.visits[key] = (state.visits[key] || 0) + inc;
+    state.lastVisit = new Date().toISOString();
+    saveState(state);
+    // play sound if enabled
+    if(soundToggle.checked) playBeep();
+    // animate
+    animateCount(parseInt(counterDisplay.textContent||'0'), state.total);
+    refreshUI();
+    updateChart();
+  }
+
+  // On page load we increment automatically (as the requirement)
+  // But to avoid double increments when user reloads quickly, this still increments every load per the prompt.
+  recordVisit(1);
+
+  // Manual add visitor button
+  addVisitorNow.addEventListener('click', ()=> recordVisit(1));
+
+  // Name change
+  nameInput.addEventListener('input', (e)=>{
+    state.name = e.target.value.trim(); saveState(state); refreshUI();
+  });
+
+  // Theme toggle
+  themeToggle.addEventListener('click', ()=>{
+    state.theme = (state.theme === 'light') ? 'dark' : 'light'; saveState(state); applyTheme(state.theme);
+  });
+
+  // Reset data (dangerous) — confirm
+  resetBtn.addEventListener('click', ()=>{
+    if(confirm('Reset semua data local (total, visits, name, theme)?')){
+      state = JSON.parse(JSON.stringify(defaultState)); saveState(state); refreshUI(); updateChart();
     }
+  });
 
-    /* ---------------------
-       STORAGE KEYS
-       --------------------- */
-    const LS_KEYS = {
-      total: 'jiyy_total_visitors',
-      name: 'jiyy_name',
-      theme: 'jiyy_theme',
-      lastVisit: 'jiyy_last_visit',
-      history: 'jiyy_history' // store per-date counts: { "2025-12-03": 5, ... }
-    };
+  // -------------------- Sound (WebAudio) --------------------
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playBeep(){
+    try{
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 880; // A5
+      g.gain.value = 0.0001;
+      o.connect(g); g.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      g.gain.linearRampToValueAtTime(0.15, now + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      o.start(now); o.stop(now + 0.4);
+    }catch(e){console.warn('Audio failed', e)}
+  }
 
-    /* ---------------------
-       INITIALIZATION
-       --------------------- */
-    // DOM elements
-    const visitorCountEl = document.getElementById('visitorCount');
-    const greetingEl = document.getElementById('greeting');
-    const lastVisitNoteEl = document.getElementById('lastVisitNote');
-    const lastVisitEl = document.getElementById('lastVisit');
-    const nameInputEl = document.getElementById('nameInput');
-    const displayNameEl = document.getElementById('displayName');
-    const saveNameBtn = document.getElementById('saveName');
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const currentThemeEl = document.getElementById('currentTheme');
-    const modeLabelEl = document.getElementById('modeLabel');
-    const soundToggleBtn = document.getElementById('soundToggle');
-    const incBtn = document.getElementById('incBtn');
+  // -------------------- Share links --------------------
+  function updateShare(){
+    const url = encodeURIComponent(location.href);
+    const text = encodeURIComponent('Jiyy Eazy — cek halaman pengunjung ini!');
+    shareTwitter.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+  }
+  updateShare();
 
-    // Load from localStorage or set defaults
-    let total = Number(localStorage.getItem(LS_KEYS.total) || 0);
-    let storedName = localStorage.getItem(LS_KEYS.name) || '';
-    let theme = localStorage.getItem(LS_KEYS.theme) || 'dark';
-    let lastVisit = localStorage.getItem(LS_KEYS.lastVisit) || null;
-    let history = JSON.parse(localStorage.getItem(LS_KEYS.history) || '{}');
+  // Update when URL changes (single page)
+  window.addEventListener('popstate', updateShare);
 
-    // Apply theme to document
-    document.documentElement.setAttribute('data-theme', theme);
-    currentThemeEl.textContent = theme === 'light' ? 'Terang' : 'Gelap';
-    soundToggleBtn.textContent = 'Suara: On';
+  // -------------------- Chart.js integration --------------------
+  const ctx = qs('#visitorsChart').getContext('2d');
+  let visitorsChart = null;
 
-    // Set name if exists
-    if (storedName) {
-      displayNameEl.textContent = storedName;
-      nameInputEl.value = storedName;
-      greetingEl.textContent = `Halo, ${storedName}! Selamat datang di Jiyy Eazy.`;
-    }
-
-    // Last visit display
-    if (lastVisit) {
-      lastVisitEl.textContent = formatDateTime(Number(lastVisit));
-      lastVisitNoteEl.textContent = `Kunjungan terakhir: ${formatDateTime(Number(lastVisit))}`;
-    } else {
-      lastVisitEl.textContent = '-';
-    }
-
-    /* ---------------------
-      Increment visitor on page open
-      - Requirement: otomatis bertambah setiap kali halaman dibuka.
-      - We will increment total and update today's date count in history
-      --------------------- */
-    function incrementVisitor(by=1, animate=true) {
-      const prev = total;
-      total += by;
-      localStorage.setItem(LS_KEYS.total, String(total));
-
-      // Update today's bucket in history
-      const todayKey = (new Date()).toISOString().slice(0,10); // YYYY-MM-DD
-      history = JSON.parse(localStorage.getItem(LS_KEYS.history) || '{}');
-      history[todayKey] = (history[todayKey] || 0) + by;
-      localStorage.setItem(LS_KEYS.history, JSON.stringify(history));
-
-      // Update last visit timestamp
-      const now = Date.now();
-      localStorage.setItem(LS_KEYS.lastVisit, String(now));
-      lastVisit = String(now);
-      lastVisitNoteEl.textContent = `Kunjungan terakhir: ${formatDateTime(now)}`;
-      lastVisitEl.textContent = formatDateTime(now);
-
-      // UI: animate numeric change
-      animateCount(prev, total, animate);
-
-      // play sound
-      if (soundOn) {
-        playPing();
-      }
-
-      // refresh chart with new data
-      updateChart();
-    }
-
-    /* ---------------------
-      Animated number change using GSAP
-      --------------------- */
-    function animateCount(from, to, animate=true) {
-      // If animate is false just set immediately
-      if (!animate) { visitorCountEl.textContent = String(to); return; }
-
-      // Use GSAP to animate a number tween
-      const obj = {val: from};
-      gsap.to(obj, {
-        val: to,
-        duration: 1,
-        ease: "power2.out",
-        onUpdate() {
-          visitorCountEl.textContent = Math.floor(obj.val).toLocaleString();
-        },
-        onComplete() {
-          visitorCountEl.textContent = to.toLocaleString();
-          // a small pulse for emphasis
-          gsap.fromTo(visitorCountEl, {scale:1}, {scale:1.06, duration:0.14, yoyo:true, repeat:1, ease:'power1.inOut'});
-        }
-      });
-    }
-
-    /* ---------------------
-       SOUND: Simple click/ping via WebAudio API
-       - No external files; create oscillator beep
-       --------------------- */
-    let audioCtx = null;
-    let soundOn = true;
-    function playPing() {
-      try {
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = 'sine';
-        o.frequency.value = 780; // frequency in Hz
-        g.gain.value = 0.0001;
-        o.connect(g);
-        g.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-        g.gain.setValueAtTime(0.0001, now);
-        g.gain.exponentialRampToValueAtTime(0.08, now+0.02);
-        o.start(now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now+0.25);
-        o.stop(now+0.26);
-      } catch (e) {
-        console.warn('Audio not supported or user gesture required', e);
-      }
-    }
-
-    soundToggleBtn.addEventListener('click', () => {
-      soundOn = !soundOn;
-      soundToggleBtn.textContent = `Suara: ${soundOn ? 'On' : 'Off'}`;
-    });
-
-    /* ---------------------
-       Save name input
-       --------------------- */
-    saveNameBtn.addEventListener('click', () => {
-      const val = nameInputEl.value.trim();
-      if (!val) return alert('Masukkan nama terlebih dahulu.');
-      storedName = val;
-      localStorage.setItem(LS_KEYS.name, storedName);
-      displayNameEl.textContent = storedName;
-      greetingEl.textContent = `Halo, ${storedName}! Selamat datang di Jiyy Eazy.`;
-      // small animation to highlight change
-      gsap.fromTo(displayNameEl, {x:-6, opacity:0.6}, {x:0, opacity:1, duration:0.5, ease:'power2.out'});
-    });
-
-    /* ---------------------
-       Theme toggle
-       --------------------- */
-    themeToggleBtn.addEventListener('click', () => {
-      theme = (theme === 'dark') ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem(LS_KEYS.theme, theme);
-      currentThemeEl.textContent = theme === 'light' ? 'Terang' : 'Gelap';
-      // subtle animation
-      gsap.fromTo(document.body, {opacity:0.94}, {opacity:1, duration:0.35});
-    });
-
-    /* ---------------------
-       Manual increment button (for demo)
-       --------------------- */
-    incBtn.addEventListener('click', () => {
-      incrementVisitor(1, true);
-    });
-
-    /* ---------------------
-       Share buttons (Twitter / Facebook)
-       - Open share URL in new window
-       --------------------- */
-    document.getElementById('shareTwitter').addEventListener('click', () => {
-      const text = encodeURIComponent('Lihat visitor counter keren ini — Jiyy Eazy!');
-      const url = encodeURIComponent(location.href);
-      const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-      window.open(shareUrl,'_blank','noopener');
-    });
-
-    document.getElementById('shareFacebook').addEventListener('click', () => {
-      const url = encodeURIComponent(location.href);
-      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-      window.open(shareUrl,'_blank','noopener');
-    });
-
-    /* ---------------------
-       CHART.JS: Setup and update functions
-       - Use history object stored in localStorage
-       - Provide daily / weekly / monthly modes
-       --------------------- */
-    const ctx = document.getElementById('visitorChart').getContext('2d');
-
-    // Default Chart.js config
-    const baseConfig = {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Pengunjung',
-          data: [],
-          fill:true,
-          tension:0.35,
-          pointRadius:4,
-          pointHoverRadius:6,
-          borderWidth:2,
-          backgroundColor: createGradient()
-        }]
-      },
+  function buildChart(labels, data){
+    if(visitorsChart) visitorsChart.destroy();
+    visitorsChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ label:'Jumlah pengunjung', data, tension:0.3, backgroundColor: 'rgba(124,58,237,0.8)'}] },
       options: {
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{
-          legend:{display:false},
-          tooltip:{mode:'index', intersect:false}
-        },
-        scales: {
-          x: { grid: {display:false}, ticks: {color: 'var(--muted)'} },
-          y: { grid: {color:'rgba(255,255,255,0.03)'}, ticks: {color:'var(--muted)', beginAtZero:true} }
-        }
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}}, y:{beginAtZero:true}}
       }
-    };
-
-    // Helper to create gradient for chart fill (uses current canvas)
-    function createGradient() {
-      try {
-        const g = ctx.createLinearGradient(0,0,0,200);
-        // colors follow CSS variables -- we can't directly read gradient objects, but we pick soft colors
-        g.addColorStop(0, 'rgba(124,92,255,0.26)');
-        g.addColorStop(1, 'rgba(34,193,195,0.04)');
-        return g;
-      } catch (e) {
-        return 'rgba(124,92,255,0.12)';
-      }
-    }
-
-    let visitorChart = new Chart(ctx, baseConfig);
-
-    // Get array of last N dates
-    function getLastNDates(n) {
-      const arr = [];
-      for (let i = n-1; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        arr.push(d.toISOString().slice(0,10));
-      }
-      return arr;
-    }
-
-    // Prepare chart data for daily/weekly/monthly
-    function prepareChartData(mode='daily') {
-      const raw = JSON.parse(localStorage.getItem(LS_KEYS.history) || '{}');
-      const labels = [];
-      const data = [];
-
-      if (mode === 'daily') {
-        const dates = getLastNDates(14); // last 14 days
-        dates.forEach(date => {
-          labels.push(date.slice(5)); // MM-DD to shorten
-          data.push(raw[date] || 0);
-        });
-      } else if (mode === 'weekly') {
-        // last 12 weeks: sum per week (Mon-Sun)
-        const today = new Date();
-        const resLabels = [];
-        const resData = [];
-        for (let w=11; w>=0; w--) {
-          const d = new Date();
-          d.setDate(today.getDate() - w*7);
-          const start = new Date(d);
-          start.setDate(d.getDate() - d.getDay()); // start of week (Sunday)
-          let sum = 0;
-          for (let i=0;i<7;i++){
-            const x = new Date(start);
-            x.setDate(start.getDate()+i);
-            const key = x.toISOString().slice(0,10);
-            sum += Number(raw[key] || 0);
-          }
-          resLabels.push(`${start.toISOString().slice(5,10)}`);
-          resData.push(sum);
-        }
-        return {labels:resLabels, data:resData};
-      } else if (mode === 'monthly') {
-        // last 6 months
-        const now = new Date();
-        for (let m=5; m>=0; m--){
-          const d = new Date(now.getFullYear(), now.getMonth()-m, 1);
-          const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-          let sum = 0;
-          // iterate over days of that month
-          const next = new Date(d.getFullYear(), d.getMonth()+1, 1);
-          for (let day = new Date(d); day < next; day.setDate(day.getDate()+1)){
-            const k = day.toISOString().slice(0,10);
-            sum += Number(raw[k] || 0);
-          }
-          labels.push(monthKey);
-          data.push(sum);
-        }
-      }
-
-      return {labels, data};
-    }
-
-    // Update chart with a mode
-    let currentMode = 'daily';
-    function updateChart(mode=currentMode) {
-      currentMode = mode;
-      modeLabelEl.textContent = mode === 'daily' ? 'Harian' : (mode === 'weekly' ? 'Mingguan' : 'Bulanan');
-
-      const prepared = prepareChartData(mode);
-      // Update dataset
-      visitorChart.data.labels = prepared.labels;
-      visitorChart.data.datasets[0].data = prepared.data;
-      visitorChart.data.datasets[0].backgroundColor = createGradient();
-      visitorChart.update('active');
-      // subtle entrance animation via GSAP on canvas element
-      gsap.fromTo(document.getElementById('visitorChart'), {y:8, opacity:0.85}, {y:0, opacity:1, duration:0.6, ease:'power2.out'});
-    }
-
-    // Chart mode buttons
-    document.querySelectorAll('.chip').forEach(c => {
-      c.addEventListener('click', e => {
-        document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-        c.classList.add('active');
-        const mode = c.getAttribute('data-mode');
-        updateChart(mode);
-      });
     });
+  }
 
-    /* ---------------------
-       INITIAL UI SETUP
-       --------------------- */
-    // show initial total without animation
-    animateCount(total, total, false);
-
-    // Put initial values on load
-    if (storedName) {
-      displayNameEl.textContent = storedName;
-      greetingEl.textContent = `Halo, ${storedName}! Selamat datang di Jiyy Eazy.`;
+  function getVisitsArray(days){
+    // returns arrays for last `days` days
+    const arr = []; const labels = [];
+    const now = new Date();
+    for(let i=days-1;i>=0;i--){
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      labels.push(d.toLocaleDateString('id-ID', {month:'short', day:'numeric'}));
+      arr.push(state.visits[key] || 0);
     }
+    return {labels, arr};
+  }
 
-    // Initial increment (page opened)
-    // We run incrementVisitor after a short delay to allow UI to initialize and let animations be visible
-    window.addEventListener('load', () => {
-      // Auto-increment by 1 on each page open
-      setTimeout(()=> incrementVisitor(1, true), 300);
-      // Build chart
-      updateChart('daily');
-      // Logo entrance
-      gsap.from('#logo', {scale:0.8, opacity:0, duration:0.8, ease:'elastic.out(1,0.6)'});
-      gsap.from('.card', {y:12, opacity:0, duration:0.6, stagger:0.06, ease:'power2.out'});
-    });
+  function updateChart(){
+    const days = parseInt(rangeSelect.value || '7');
+    const {labels, arr} = getVisitsArray(days);
+    buildChart(labels, arr);
+  }
+  rangeSelect.addEventListener('change', updateChart);
 
-    /* ---------------------
-       Accessibility: update aria-live text when count changes
-       --------------------- */
-    const observer = new MutationObserver(() => {
-      visitorCountEl.setAttribute('aria-label', `Jumlah pengunjung ${visitorCountEl.textContent}`);
-    });
-    observer.observe(visitorCountEl, {childList:true, characterData:true, subtree:true});
+  // -------------------- Initial render --------------------
+  refreshUI();
+  updateChart();
 
-    /* ---------------------
-       Extra: small anti-cheat/display niceties
-       - Format numbers with thousands separators
-       --------------------- */
-    function formatNumber(n){ return n.toLocaleString(); }
+  // -------------------- Small entrance animations (GSAP) --------------------
+  gsap.from('.card', {duration:0.8, y:18, opacity:0, stagger:0.06, ease:'power3.out'});
 
-    // expose to console for testing (dev convenience)
-    window.JiyyEazy = {
-      incrementVisitor,
-      getTotal: ()=> total,
-      resetAll: ()=> {
-        if (confirm('Reset semua data lokal (localStorage)?')) {
-          Object.values(LS_KEYS).forEach(k=>localStorage.removeItem(k));
-          location.reload();
-        }
-      }
-    };
+  // -------------------- Utility: small debounce for saving ---
+  let saveTimer = null;
+  function debounceSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(()=> saveState(state), 400); }
 
-    /* ======================
-       END OF SCRIPT
-       ====================== */
+  // Update counterDisplay dataset initial
+  counterDisplay.dataset.current = state.total;
+  counterDisplay.textContent = state.total;
+
+  // Update last visit displays
+  lastVisitEl.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
+  lastVisitBig.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
+
+  // small helper in case local state mutated from other tab
+  window.addEventListener('storage', (e)=>{ if(e.key === KEY){ state = loadState(); refreshUI(); updateChart(); }});
+
+  // copy to clipboard share support (optional extra)
+  // example: add a click handler to one of the share links to copy link
+  shareTwitter.addEventListener('click', (ev)=>{
+    // allow the default navigation; but also try to copy
+    try{ navigator.clipboard?.writeText(location.href); }catch(e){}
+  });
+
+  // Done
   </script>
 </body>
 </html>
