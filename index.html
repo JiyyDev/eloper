@@ -3,54 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jiyy Eazy — Visitor Counter</title>
-  <!-- Chart.js CDN -->
+  <title>Jiyy Eazy — Realtime Visitor Counter</title>
+
+  <!-- Chart.js & GSAP -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- GSAP CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
   <style>
-    /* ------------------ Reset & base ------------------ */
+    /* ---------------- Reset & base ---------------- */
     :root{
-      --bg:#0f172a; --card:#0b1220; --muted:#94a3b8; --accent:#7c3aed; --glass:rgba(255,255,255,0.04); --text:#e6eef8;
+      --bg:#071026; --card:#0b1630; --muted:#94a3b8; --accent:#7c3aed; --accent2:#06b6d4; --glass:rgba(255,255,255,0.04); --text:#e6eef8;
     }
-    .light{
-      --bg:#f6f8fb; --card:#ffffff; --muted:#5b6b7a; --accent:#7c3aed; --glass:rgba(12,18,30,0.03); --text:#071029;
-    }
+    .light{ --bg:#f6f8fb; --card:#ffffff; --muted:#566270; --accent:#6d28d9; --accent2:#0891b2; --glass:rgba(2,6,23,0.03); --text:#061226; }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background:linear-gradient(180deg,var(--bg), #071029); color:var(--text); -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale; padding:24px;
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg), #071029); color:var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      padding:28px; transition:background .25s,color .25s;
+      -webkit-tap-highlight-color: transparent; /* remove mobile blue */
     }
-    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    /* remove selection highlight (blue) */
+    ::selection{ background: transparent; color: inherit; }
+    /* custom focus */
+    :focus{ outline: none; box-shadow: 0 0 0 4px rgba(124,58,237,0.12); border-radius:6px; }
+
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:white;box-shadow:0 8px 30px rgba(3,7,18,0.6)}
     h1{margin:0;font-size:20px}
     .controls{display:flex;gap:10px;align-items:center}
-    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;cursor:pointer}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:16px;border-radius:16px;box-shadow:0 6px 20px rgba(2,6,23,0.5);backdrop-filter: blur(6px);}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--text);font-size:14px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:18px;border-radius:14px;box-shadow:0 8px 26px rgba(2,6,23,0.45);backdrop-filter: blur(6px);}
 
-    /* Left column */
-    .hero{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:16px}
-    .big-counter{font-size:48px;font-weight:800;letter-spacing:1px}
-    .meta{color:var(--muted);font-size:14px}
+    .hero{display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:12px}
+    .big-counter{font-size:56px;font-weight:800;letter-spacing:1px}
+    .meta{color:var(--muted);font-size:13px}
     .row{display:flex;gap:12px;align-items:center}
-    input[type=text]{padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);width:100%;font-size:14px}
-
-    /* Chart area */
-    .chart-card{padding:16px}
+    input[type=text]{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;font-size:14px;background:transparent;color:var(--text)}
+    input::placeholder{color:#98aac5;opacity:0.9}
+    .chart-card{padding:14px}
     canvas{max-width:100%}
-
-    /* Right column */
     .side{display:flex;flex-direction:column;gap:12px}
     .small{font-size:13px;color:var(--muted)}
     .share{display:flex;gap:8px}
-    .share a{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--text);background:var(--glass)}
-
+    .share a{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--text);background:var(--glass);font-size:14px}
     footer{grid-column:1 / -1;margin-top:18px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
-
     @media (max-width:980px){.wrap{grid-template-columns:1fr} .logo{width:44px;height:44px}}
   </style>
 </head>
@@ -62,58 +62,57 @@
           <div class="logo">JZ</div>
           <div>
             <h1>Jiyy Eazy</h1>
-            <div class="meta">Halaman penghitungan pengunjung sederhana & modern</div>
+            <div class="meta">Realtime visitor counter • Firebase Realtime DB</div>
           </div>
         </div>
         <div class="controls">
-          <button id="themeToggle" class="btn" title="Toggle theme">Toggle Theme</button>
-          <button id="resetBtn" class="btn" title="Reset data">Reset</button>
+          <button id="themeToggle" class="btn" aria-pressed="false">Toggle Theme</button>
+          <button id="resetBtn" class="btn">Reset Local</button>
         </div>
       </header>
 
-      <section class="card hero">
+      <section class="card hero" aria-labelledby="heroTitle">
         <div class="row" style="justify-content:space-between;align-items:flex-start">
           <div>
-            <div class="big-counter" id="counterDisplay">0</div>
-            <div class="meta">Total pengunjung (disimpan di <code>localStorage</code>)</div>
+            <div id="heroTitle" class="big-counter" aria-live="polite">0</div>
+            <div class="meta">Total pengunjung (global)</div>
           </div>
-          <div style="min-width:180px">
-            <label class="small">Nama Anda</label>
-            <input id="nameInput" type="text" placeholder="Masukkan nama..." />
-            <div style="height:8px"></div>
+
+          <div style="min-width:220px">
+            <label class="small" for="nameInput">Nama Anda</label>
+            <input id="nameInput" type="text" autocomplete="name" placeholder="Masukkan nama..." />
+            <div style="height:10px"></div>
             <div class="meta">Terakhir kunjungan: <span id="lastVisit">-</span></div>
           </div>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
-          <button id="addVisitorNow" class="btn">Tambah pengunjung (simulasi)</button>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap">
+          <button id="simulateAdd" class="btn">Tambah (Simulasi)</button>
           <div id="greeting" class="meta">Halo —</div>
+          <div style="flex:1"></div>
+          <div class="meta small">Suara: <label><input id="soundToggle" type="checkbox" checked /> aktif</label></div>
         </div>
       </section>
 
       <section class="card chart-card" style="margin-top:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px">
           <div>
             <strong>Grafik kunjungan</strong>
-            <div class="small">Pilih rentang untuk melihat data harian / mingguan / bulanan</div>
+            <div class="small">Rentang: <select id="rangeSelect" class="btn" style="padding:6px 8px;">
+              <option value="7">7 hari</option>
+              <option value="30">30 hari</option>
+              <option value="90">90 hari</option>
+            </select></div>
           </div>
-          <div>
-            <select id="rangeSelect" class="btn">
-              <option value="7">7 hari (harian)</option>
-              <option value="30">30 hari (harian)</option>
-              <option value="90">90 hari (3 bulan)</option>
-              <option value="365">365 hari (tahunan)</option>
-            </select>
-          </div>
+          <div class="small">Mode chart: bar</div>
         </div>
-        <canvas id="visitorsChart" height="120"></canvas>
+        <canvas id="visitorsChart" height="140" aria-label="Grafik pengunjung"></canvas>
       </section>
-
     </div>
 
     <aside class="side">
       <div class="card">
-        <h3 style="margin-top:0">Informasi singkat</h3>
+        <h3 style="margin-top:0">Informasi</h3>
         <div class="small">Pesan: <strong>Jiyy Eazy</strong></div>
         <div style="height:8px"></div>
         <div class="small">Theme: <span id="themeLabel">Dark</span></div>
@@ -124,233 +123,311 @@
 
       <div class="card">
         <h4 style="margin-top:0">Bagikan</h4>
-        <div class="share">
+        <div class="share" role="navigation" aria-label="share links">
           <a id="shareTwitter" target="_blank" rel="noopener">Twitter</a>
           <a id="shareFacebook" target="_blank" rel="noopener">Facebook</a>
         </div>
         <div style="height:8px"></div>
-        <div class="small">Suara saat bertambah: <label style="margin-left:6px"><input type="checkbox" id="soundToggle" checked /> Aktif</label></div>
+        <div class="small">Penghitungan langsung ke Firebase saat pertama load halaman.</div>
       </div>
 
       <div class="card">
         <h4 style="margin-top:0">Tentang</h4>
-        <div class="small">Halaman ini menyimpan data pengunjung per-tanggal, preferensi tema, dan nama di localStorage sehingga persistensinya ada pada browser Anda.</div>
+        <div class="small">Data global: Firebase Realtime DB. Preferensi: localStorage (nama, tema, lastVisit).</div>
       </div>
     </aside>
 
     <footer>
       <div>Built with ❤️ — Jiyy Eazy</div>
-      <div class="small">Local-only demo • Data tersimpan di browser Anda</div>
+      <div class="small">Realtime • Data disimpan di Firebase</div>
     </footer>
   </div>
 
-  <script>
-  // -------------------- Helper utilities --------------------
-  const qs = s => document.querySelector(s);
-  const formatDate = d => new Date(d).toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'});
+  <!-- ===========================
+       SCRIPT: Firebase & App Logic
+       =========================== -->
+  <script type="module">
+  /************************************************************************
+   * Jiyy Eazy — Realtime visitor counter (Firebase)
+   * - Uses Firebase Realtime Database (transactions + onValue)
+   * - Updates chart from visits/YYYY-MM-DD
+   * - SessionStorage to avoid double counting per tab/day
+   * - LocalStorage for name/theme/lastVisit
+   * - GSAP animations + Chart.js + WebAudio beep
+   **************************************************************************/
+
+  // ---------- helpers ----------
+  const $ = s => document.querySelector(s);
+  const formatDateTime = d => new Date(d).toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'});
   const todayKey = () => {
     const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  }
-
-  // -------------------- Local storage keys --------------------
-  const KEY = 'jiyy_eazy_v1';
-
-  // Default structure saved in localStorage
-  const defaultState = {
-    total: 0,                 // total pengunjung sejauh ini
-    visits: {},               // object { 'YYYY-MM-DD': count }
-    lastVisit: null,          // ISO string
-    name: '',
-    theme: 'dark'
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   };
 
-  // Read from storage or return default
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : defaultState;
-    }catch(e){console.error('loadState',e); return defaultState}
+  // ---------- Firebase imports ----------
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+  import {
+    getDatabase, ref, runTransaction, onValue, get, child
+  } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js";
+
+  // ---------- Firebase config (YOU PROVIDED) ----------
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4r6l8o48oMIdNJQPgAXEGvD_CwbGhNDk",
+    authDomain: "jieerealtime.firebaseapp.com",
+    databaseURL: "https://jieerealtime-default-rtdb.firebaseio.com",
+    projectId: "jieerealtime",
+    storageBucket: "jieerealtime.firebasestorage.app",
+    messagingSenderId: "550011188558",
+    appId: "1:550011188558:web:5c79a2063ce13885ec5a1f",
+    measurementId: "G-HLTHF5PW3F"
+  };
+
+  // ---------- init ----------
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const totalRef = ref(db, 'globalCounter');       // globalCounter -> number
+  const visitsRefRoot = ref(db, 'visits');         // visits/YYYY-MM-DD -> number
+  const lastVisitRef = ref(db, 'lastVisit');       // lastVisit -> ISO string
+
+  // ---------- UI refs ----------
+  const counterDisplay = $('#heroTitle');
+  const lastVisitSm = $('#lastVisit');
+  const lastVisitBig = $('#lastVisitBig');
+  const nameInput = $('#nameInput');
+  const greeting = $('#greeting');
+  const simulateBtn = $('#simulateAdd');
+  const themeToggle = $('#themeToggle');
+  const themeLabel = $('#themeLabel');
+  const resetBtn = $('#resetBtn');
+  const soundToggle = $('#soundToggle');
+  const rangeSelect = $('#rangeSelect');
+  const shareTwitter = $('#shareTwitter');
+  const shareFacebook = $('#shareFacebook');
+
+  // chart holder
+  const ctx = document.getElementById('visitorsChart').getContext('2d');
+  let visitorsChart = null;
+
+  // ---------- state from localStorage ----------
+  let state = {
+    name: localStorage.getItem('jz_name') || '',
+    theme: localStorage.getItem('jz_theme') || 'dark',
+    lastVisit: localStorage.getItem('jz_lastVisit') || null,
+  };
+
+  // apply theme UI
+  function applyTheme(t){
+    if(t === 'light'){ document.documentElement.classList.add('light'); themeLabel.textContent = 'Light'; themeToggle.setAttribute('aria-pressed','true'); }
+    else { document.documentElement.classList.remove('light'); themeLabel.textContent = 'Dark'; themeToggle.setAttribute('aria-pressed','false'); }
   }
-  function saveState(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  applyTheme(state.theme);
 
-  // -------------------- App init --------------------
-  let state = loadState();
+  if(state.name){ nameInput.value = state.name; greeting.textContent = `Halo, ${state.name}!`; }
+  if(state.lastVisit){ lastVisitSm.textContent = formatDateTime(state.lastVisit); lastVisitBig.textContent = formatDateTime(state.lastVisit); }
 
-  // Apply theme
-  function applyTheme(theme){
-    if(theme === 'light') document.documentElement.classList.add('light');
-    else document.documentElement.classList.remove('light');
-    qs('#themeLabel').textContent = theme === 'light' ? 'Light' : 'Dark';
-  }
-  applyTheme(state.theme || 'dark');
+  // GSAP entrance
+  gsap.from('.card', {duration:0.9, y:20, opacity:0, stagger:0.06, ease:'power3.out'});
 
-  // Elements
-  const counterDisplay = qs('#counterDisplay');
-  const lastVisitEl = qs('#lastVisit');
-  const lastVisitBig = qs('#lastVisitBig');
-  const nameInput = qs('#nameInput');
-  const greeting = qs('#greeting');
-  const addVisitorNow = qs('#addVisitorNow');
-  const themeToggle = qs('#themeToggle');
-  const resetBtn = qs('#resetBtn');
-  const shareTwitter = qs('#shareTwitter');
-  const shareFacebook = qs('#shareFacebook');
-  const rangeSelect = qs('#rangeSelect');
-  const soundToggle = qs('#soundToggle');
-
-  // Initialize UI from state
-  function refreshUI(){
-    // Counter with GSAP tween for smooth increment
-    gsap.to({}, {duration:0.6, onUpdate: () => {}, onComplete: ()=>{}});
-    animateCount(parseInt(counterDisplay.dataset.current||'0'), state.total);
-
-    lastVisitEl.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
-    lastVisitBig.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
-    nameInput.value = state.name || '';
-    greeting.textContent = state.name ? `Halo, ${state.name}!` : 'Halo — silakan masukkan nama di samping.';
-    applyTheme(state.theme || 'dark');
-  }
-
-  // Animate number change using GSAP
-  function animateCount(from, to){
-    // store current for subsequent calls
-    counterDisplay.dataset.current = to;
-    gsap.fromTo(counterDisplay, {innerText: from}, {duration:0.8, innerText: to, snap:{innerText:1}, ease:'power3.out', onUpdate(){ counterDisplay.textContent = Math.floor(this.targets()[0].innerText); }});
-  }
-
-  // -------------------- Visitor logic --------------------
-  function recordVisit(inc=1){
-    const key = todayKey();
-    state.total = (state.total || 0) + inc;
-    state.visits[key] = (state.visits[key] || 0) + inc;
-    state.lastVisit = new Date().toISOString();
-    saveState(state);
-    // play sound if enabled
-    if(soundToggle.checked) playBeep();
-    // animate
-    animateCount(parseInt(counterDisplay.textContent||'0'), state.total);
-    refreshUI();
-    updateChart();
-  }
-
-  // On page load we increment automatically (as the requirement)
-  // But to avoid double increments when user reloads quickly, this still increments every load per the prompt.
-  recordVisit(1);
-
-  // Manual add visitor button
-  addVisitorNow.addEventListener('click', ()=> recordVisit(1));
-
-  // Name change
-  nameInput.addEventListener('input', (e)=>{
-    state.name = e.target.value.trim(); saveState(state); refreshUI();
-  });
-
-  // Theme toggle
-  themeToggle.addEventListener('click', ()=>{
-    state.theme = (state.theme === 'light') ? 'dark' : 'light'; saveState(state); applyTheme(state.theme);
-  });
-
-  // Reset data (dangerous) — confirm
-  resetBtn.addEventListener('click', ()=>{
-    if(confirm('Reset semua data local (total, visits, name, theme)?')){
-      state = JSON.parse(JSON.stringify(defaultState)); saveState(state); refreshUI(); updateChart();
-    }
-  });
-
-  // -------------------- Sound (WebAudio) --------------------
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  function playBeep(){
-    try{
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type = 'sine'; o.frequency.value = 880; // A5
-      g.gain.value = 0.0001;
-      o.connect(g); g.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-      g.gain.linearRampToValueAtTime(0.15, now + 0.005);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      o.start(now); o.stop(now + 0.4);
-    }catch(e){console.warn('Audio failed', e)}
-  }
-
-  // -------------------- Share links --------------------
-  function updateShare(){
+  // share links
+  function updateShareLinks(){
     const url = encodeURIComponent(location.href);
     const text = encodeURIComponent('Jiyy Eazy — cek halaman pengunjung ini!');
     shareTwitter.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
     shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
   }
-  updateShare();
+  updateShareLinks();
 
-  // Update when URL changes (single page)
-  window.addEventListener('popstate', updateShare);
+  // WebAudio beep
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = AudioContext ? new AudioContext() : null;
+  function playBeep(){
+    if(!audioCtx) return;
+    try{
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 880;
+      g.gain.value = 0.0001;
+      o.connect(g); g.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      g.gain.linearRampToValueAtTime(0.12, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      o.start(now); o.stop(now + 0.42);
+    }catch(e){ console.warn('audio error', e); }
+  }
 
-  // -------------------- Chart.js integration --------------------
-  const ctx = qs('#visitorsChart').getContext('2d');
-  let visitorsChart = null;
+  // Animate counter with GSAP
+  function animateCounterTo(n){
+    const from = parseInt(counterDisplay.dataset.current || '0',10);
+    gsap.fromTo(counterDisplay, {innerText: from}, {
+      duration: 0.7,
+      innerText: n,
+      snap: { innerText: 1 },
+      ease: 'power3.out',
+      onUpdate() { counterDisplay.textContent = Math.round(this.targets()[0].innerText); }
+    });
+    counterDisplay.dataset.current = n;
+  }
 
-  function buildChart(labels, data){
+  // ---------- realtime listeners ----------
+  onValue(totalRef, snap => {
+    const val = snap.val() || 0;
+    animateCounterTo(val);
+  });
+
+  onValue(lastVisitRef, snap => {
+    const v = snap.val();
+    if(v){
+      lastVisitSm.textContent = formatDateTime(v);
+      lastVisitBig.textContent = formatDateTime(v);
+    }
+  });
+
+  // ---------- increment logic ----------
+  // increment globalCounter and visits/YYYY-MM-DD atomically (two transactions)
+  async function incrementGlobal(amount = 1){
+    // globalCounter
+    try {
+      await runTransaction(totalRef, curr => (curr || 0) + amount);
+    } catch(e){ console.error('inc total failed', e); }
+    // today's visits
+    const key = todayKey();
+    const thisVisitRef = ref(db, `visits/${key}`);
+    try {
+      await runTransaction(thisVisitRef, curr => (curr || 0) + amount);
+    } catch(e){ console.error('inc visit failed', e); }
+    // update lastVisit
+    try {
+      const t = new Date().toISOString();
+      // write lastVisit (not critical to be transactional)
+      await runTransaction(lastVisitRef, _ => t);
+      // store local lastVisit too
+      localStorage.setItem('jz_lastVisit', t);
+      lastVisitSm.textContent = formatDateTime(t);
+      lastVisitBig.textContent = formatDateTime(t);
+    } catch(e){ /* ignore */ }
+  }
+
+  // Auto increment once per tab/day using sessionStorage (prevent reload spam)
+  (async function autoCountOncePerDay(){
+    try {
+      const flagKey = 'jz_counted:' + todayKey();
+      if(!sessionStorage.getItem(flagKey)){
+        await incrementGlobal(1);
+        sessionStorage.setItem(flagKey, '1');
+        if(soundToggle.checked) playBeep();
+      }
+    } catch(err){
+      console.error('auto increment error', err);
+    }
+  })();
+
+  // Manual simulate button
+  simulateBtn.addEventListener('click', async () => {
+    await incrementGlobal(1);
+    if(soundToggle.checked) playBeep();
+  });
+
+  // ---------- Chart: build from visits keys ----------
+  async function getVisitsArray(days){
+    const labels = [], counts = [];
+    const now = new Date();
+    for(let i=days-1;i>=0;i--){
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      labels.push(d.toLocaleDateString('id-ID', {month:'short', day:'numeric'}));
+      try {
+        const snap = await get(child(visitsRefRoot, key));
+        counts.push(snap.exists() ? snap.val() : 0);
+      } catch(e) {
+        counts.push(0);
+      }
+    }
+    return {labels, counts};
+  }
+
+  async function renderChart(days = parseInt(rangeSelect.value || '7')){
+    const {labels, counts} = await getVisitsArray(days);
     if(visitorsChart) visitorsChart.destroy();
     visitorsChart = new Chart(ctx, {
       type: 'bar',
-      data: { labels, datasets: [{ label:'Jumlah pengunjung', data, tension:0.3, backgroundColor: 'rgba(124,58,237,0.8)'}] },
+      data: {
+        labels,
+        datasets: [{
+          label: 'Pengunjung per hari',
+          data: counts,
+          backgroundColor: counts.map(()=> 'rgba(124,58,237,0.9)'),
+          borderRadius: 6
+        }]
+      },
       options: {
-        responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{x:{grid:{display:false}}, y:{beginAtZero:true}}
+        responsive:true,
+        maintainAspectRatio:false,
+        scales:{ x:{ grid:{ display:false } }, y:{ beginAtZero:true, ticks:{ precision:0 } } },
+        plugins:{ legend:{ display:false } }
       }
     });
   }
 
-  function getVisitsArray(days){
-    // returns arrays for last `days` days
-    const arr = []; const labels = [];
-    const now = new Date();
-    for(let i=days-1;i>=0;i--){
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      labels.push(d.toLocaleDateString('id-ID', {month:'short', day:'numeric'}));
-      arr.push(state.visits[key] || 0);
-    }
-    return {labels, arr};
-  }
+  rangeSelect.addEventListener('change', () => renderChart(parseInt(rangeSelect.value)));
+  // initial render
+  renderChart(parseInt(rangeSelect.value));
 
-  function updateChart(){
-    const days = parseInt(rangeSelect.value || '7');
-    const {labels, arr} = getVisitsArray(days);
-    buildChart(labels, arr);
-  }
-  rangeSelect.addEventListener('change', updateChart);
-
-  // -------------------- Initial render --------------------
-  refreshUI();
-  updateChart();
-
-  // -------------------- Small entrance animations (GSAP) --------------------
-  gsap.from('.card', {duration:0.8, y:18, opacity:0, stagger:0.06, ease:'power3.out'});
-
-  // -------------------- Utility: small debounce for saving ---
-  let saveTimer = null;
-  function debounceSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(()=> saveState(state), 400); }
-
-  // Update counterDisplay dataset initial
-  counterDisplay.dataset.current = state.total;
-  counterDisplay.textContent = state.total;
-
-  // Update last visit displays
-  lastVisitEl.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
-  lastVisitBig.textContent = state.lastVisit ? formatDate(state.lastVisit) : '-';
-
-  // small helper in case local state mutated from other tab
-  window.addEventListener('storage', (e)=>{ if(e.key === KEY){ state = loadState(); refreshUI(); updateChart(); }});
-
-  // copy to clipboard share support (optional extra)
-  // example: add a click handler to one of the share links to copy link
-  shareTwitter.addEventListener('click', (ev)=>{
-    // allow the default navigation; but also try to copy
-    try{ navigator.clipboard?.writeText(location.href); }catch(e){}
+  // Re-render chart realtime when visits node changes
+  onValue(visitsRefRoot, () => {
+    if(window._jz_chart_timeout) clearTimeout(window._jz_chart_timeout);
+    window._jz_chart_timeout = setTimeout(()=> renderChart(parseInt(rangeSelect.value)), 450);
   });
+
+  // ---------- local storage interactions ----------
+  nameInput.addEventListener('input', (e)=>{
+    const v = e.target.value.trim();
+    state.name = v;
+    localStorage.setItem('jz_name', v);
+    greeting.textContent = v ? `Halo, ${v}!` : 'Halo —';
+  });
+
+  themeToggle.addEventListener('click', ()=>{
+    state.theme = (state.theme === 'light') ? 'dark' : 'light';
+    localStorage.setItem('jz_theme', state.theme);
+    applyTheme(state.theme);
+  });
+
+  // sound pref
+  soundToggle.addEventListener('change', ()=> localStorage.setItem('jz_sound', soundToggle.checked ? '1' : '0'));
+  (function loadSoundPref(){ const s = localStorage.getItem('jz_sound'); if(s === '0') soundToggle.checked = false; })();
+
+  // last visit persisted on unload
+  window.addEventListener('beforeunload', ()=>{
+    const nowISO = new Date().toISOString();
+    localStorage.setItem('jz_lastVisit', nowISO);
+  });
+  // set initial local lastVisit
+  (function setInitialLastVisit(){
+    const prev = localStorage.getItem('jz_lastVisit');
+    if(prev){ lastVisitSm.textContent = formatDateTime(prev); lastVisitBig.textContent = formatDateTime(prev); }
+    const nowISO = new Date().toISOString();
+    localStorage.setItem('jz_lastVisit', nowISO);
+  })();
+
+  // reset local storage (not firebase)
+  resetBtn.addEventListener('click', ()=>{
+    if(confirm('Reset data lokal (nama, tema, lastVisit)?')) {
+      localStorage.removeItem('jz_name'); localStorage.removeItem('jz_theme'); localStorage.removeItem('jz_lastVisit'); localStorage.removeItem('jz_sound');
+      state.name = ''; state.theme = 'dark';
+      nameInput.value = ''; greeting.textContent = 'Halo —'; applyTheme('dark');
+      alert('Local data di-reset. Data global di Firebase tetap aman.');
+    }
+  });
+
+  // handle storage changes multi-tab
+  window.addEventListener('storage', (e)=>{
+    if(e.key === 'jz_name'){ nameInput.value = localStorage.getItem('jz_name') || ''; greeting.textContent = nameInput.value ? `Halo, ${nameInput.value}!` : 'Halo —'; }
+    if(e.key === 'jz_theme'){ applyTheme(localStorage.getItem('jz_theme') || 'dark'); }
+    if(e.key === 'jz_lastVisit'){ lastVisitSm.textContent = formatDateTime(localStorage.getItem('jz_lastVisit')); lastVisitBig.textContent = formatDateTime(localStorage.getItem('jz_lastVisit')); }
+  });
+
+  // accessibility: Enter on simulate button
+  simulateBtn.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') { simulateBtn.click(); e.preventDefault(); } });
 
   // Done
   </script>
